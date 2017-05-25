@@ -119,13 +119,16 @@ bool CGame::LoadGame(ifstream & file){
 	if(maxheight < maxheightLoaded || maxwidth < maxwidthLoaded)
 		return false;
 
+	int c = 0;
 	while(file >> object >> type >> ypos >> xpos){
+		c++;
 		clear();
 
-		if(!CreateObject(object, type, ypos, xpos, maxwidthLoaded)){
-			printw("Chyba v popisu objektu!");
+		if(!CreateObject(object, type, ypos, xpos, maxheightLoaded, maxwidthLoaded)){
+			printw("Chyba v popisu objektu! (%d)", c);
 			refresh();
 			usleep(1000000);
+			return false;
 		}
 	}
 
@@ -148,15 +151,20 @@ bool CGame::LoadGame(ifstream & file){
 
 
 
-bool CGame::CreateObject(const char & object, const char & type, 
-						 const int & ypos, 	  const int & xpos, 
-						 					  const int & maxwidth){
+bool CGame::CreateObject(const char & object,    const char & type, 
+						 const int & ypos, 	     const int & xpos, 
+						 const int & maxheight,  const int & maxwidth){
+	
+	if(ypos > maxheight - 4 || ypos < 1 || xpos > maxwidth - 2 || xpos < 1){
+		return false;
+	}
+
 	switch(object){
 		case 'T':
-			return CreateTower(type, ypos, xpos);
+			return CreateTower(type, ypos, xpos, maxwidth);
 			break;
 		case 'A':
-			return CreateAttacker(type, ypos, xpos);
+			return CreateAttacker(type, ypos, xpos, maxwidth);
 			break;
 		case 'G':
 			return CreateGate(type, ypos, xpos, maxwidth);
@@ -168,7 +176,10 @@ bool CGame::CreateObject(const char & object, const char & type,
 }
 
 bool CGame::CreateTower(const char & type, const int & ypos, 
-										   const int & xpos){
+						const int & xpos, const int & maxwidth){
+
+	if(xpos == 1 || xpos == maxwidth - 2) return false;
+
 	switch(type){
 		case 'T':
 			v_towers.push_back(CTower(type, ypos, xpos));
@@ -184,13 +195,16 @@ bool CGame::CreateTower(const char & type, const int & ypos,
 }
 
 bool CGame::CreateAttacker(const char & type, const int & ypos, 
-											  const int & xpos){
+						   const int & xpos, const int & maxwidth){
+
+	if(xpos == 1 || xpos == maxwidth - 2) return false;
+
 	switch(type){
 		case '@':
-			v_attackers.push_back(CAttacker(type, ypos, xpos, v_attackers.size(),m_exit_gate));
+			v_attackers.push_back(CAttacker(type, ypos, xpos, v_attackers.size(), m_exit_gate));
 			break;
 		case '&':
-			v_attackers.push_back(CAttacker(type, ypos, xpos, v_attackers.size(),m_exit_gate));
+			v_attackers.push_back(CAttacker(type, ypos, xpos, v_attackers.size(), m_exit_gate));
 			break;
 		default:
 			return false;
@@ -201,6 +215,9 @@ bool CGame::CreateAttacker(const char & type, const int & ypos,
 
 bool CGame::CreateGate(const char & type, const int & ypos, const int & xpos,
 					   										const int & maxwidth){
+
+	if(xpos != 1 && xpos != maxwidth - 2) return false;
+
 	v_gates.push_back(CGate(type, ypos, xpos, v_gates.size()+1));
 	return true;
 }

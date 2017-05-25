@@ -9,13 +9,9 @@ using namespace std;
 
 CMap::CMap(const std::vector<CTower> & twrs, const std::vector<CGate> & gts, const int & maxheight, const int & maxwidth,
 		   const CGate & exit):
-		   towers(twrs), gates(gts), m_maxheight(maxheight), m_maxwidth(maxwidth),m_exit_gate(exit)
+		   towers(twrs), gates(gts), number_of_attacker(0), m_attackers_alive(0), m_maxheight(maxheight), m_maxwidth(maxwidth), 
+		   m_exit_gate(exit)
 {
-	// map = new int*[maxheight];
-	// for(int i = 0; i < maxheight; i++){
-	// 	map[i] = new int[maxwidth];
-	// }
-
 	map.resize(maxheight);
 	for(int i = 0; i < maxheight; i++){
 		map[i].resize(maxwidth);
@@ -38,6 +34,39 @@ CMap::CMap(const std::vector<CTower> & twrs, const std::vector<CGate> & gts, con
 	}
 }
 
+CMap::CMap(const std::vector<CTower> & twrs, const std::vector<CGate> & gts,
+		   const std::vector<CAttacker> & attcks, const int & maxheight, const int & maxwidth, const CGate & exit):
+		   towers(twrs), gates(gts), attackers(attcks), number_of_attacker(0), m_attackers_alive(0),
+		   m_maxheight(maxheight), m_maxwidth(maxwidth), m_exit_gate(exit)
+{
+	map.resize(maxheight);
+	for(int i = 0; i < maxheight; i++){
+		map[i].resize(maxwidth);
+	}
+
+	for(unsigned int i = 0; i < gates.size(); i++){
+		for(int i = 0; i < maxheight; i++)
+			for(int j = 0; j < maxwidth; j++)
+				map[i][j] = 0;
+
+		for(unsigned int i = 0; i < towers.size(); i++){
+			map[towers[i].m_ypos][towers[i].m_xpos] = -8;
+		}
+
+		PrintBorders(m_maxheight, m_maxwidth, 'm');
+
+		if(gates[i].m_gate_type != '<'){
+			gates[i].path = FindPath(gates[i]);
+		}
+
+		if(attackers[i].AssignPath(gates[i])){
+			mvprintw(0,0,"Cesta pridana!, gate: %d, attacker: %d", gates[i].path.size(), attackers[i].m_start.path.size());
+			refresh();
+			usleep(1000000);
+		}
+	}	
+}
+
 CMap::~CMap(){
 	// for(int i = 0; i < m_maxheight; i++){
 	// 	delete [] map[i];
@@ -55,7 +84,7 @@ vector<pair<int,int> > CMap::FindPath(CGate & start){
 	temp.push_back(make_pair(y,x));
 	clear();
 	printw("start pos: %d,%d", y,x);
-	printw("\n end pos: %d,%d", m_exit_gate.m_ypos,m_exit_gate.m_xpos);
+	printw("\nend pos: %d,%d", m_exit_gate.m_ypos,m_exit_gate.m_xpos);
 	refresh();
 	usleep(1000000);
 
@@ -143,7 +172,7 @@ vector<pair<int,int> > CMap::FindPath(CGate & start){
 			x = path[path.size()-1].second;
 			mvprintw(0,0,"%d,%d",y,x);
 			refresh();
-			usleep(1000);
+			usleep(10000);
 
 		}
 
@@ -153,7 +182,7 @@ vector<pair<int,int> > CMap::FindPath(CGate & start){
 			move(y-1,x);
 			addch(map[y-1][x]);
 			refresh();
-			usleep(1000);
+			usleep(10000);
 			continue;
 		}
 
@@ -163,7 +192,7 @@ vector<pair<int,int> > CMap::FindPath(CGate & start){
 			move(y,x-1);
 			addch(map[y][x-1]);
 			refresh();
-			usleep(1000);
+			usleep(10000);
 			continue;
 		}
 
@@ -173,7 +202,7 @@ vector<pair<int,int> > CMap::FindPath(CGate & start){
 			move(y+1,x);
 			addch(map[y+1][x]);
 			refresh();
-			usleep(1000);
+			usleep(10000);
 			continue;
 		}
 		
@@ -183,7 +212,7 @@ vector<pair<int,int> > CMap::FindPath(CGate & start){
 			move(y,x+1);
 			addch(map[y][x+1]);
 			refresh();
-			usleep(1000);
+			usleep(10000);
 			continue;
 		}
 
@@ -197,15 +226,11 @@ vector<pair<int,int> > CMap::FindPath(CGate & start){
 		refresh();
 	}
 
+
+
 	return path;
 }
 
-
-
-CMap::CMap(const std::vector<CTower> & twrs, const std::vector<CGate> & gts,
-		   const std::vector<CAttacker> & attcks, const int & maxheight, const int & maxwidth, const CGate & exit):
-		   towers(twrs), gates(gts), attackers(attcks), number_of_attacker(attcks.size()),
-		   m_maxheight(maxheight), m_maxwidth(maxwidth),m_exit_gate(exit){}
 
 void CMap::PrintBorders (const int & maxheight, const int & maxwidth, const char & choice){
 	for(int i=0; i < maxwidth; i++){
@@ -264,10 +289,12 @@ void CMap::PrintAttackers(const int & maxheight, const int & maxwidth){
 			attron(COLOR_PAIR(1));
 		}
 
-		if(attackers[i].m_health > 0){
-			attackers[i].NewMove();
-			m_attackers_alive++;
-		}
+		if(attackers[i].m_ypos != m_exit_gate.m_ypos)
+			if(attackers[i].m_health > 0){
+				attackers[i].NewMove();
+				m_attackers_alive++;
+			}
+
 
 		attroff(COLOR_PAIR(1));
 	}

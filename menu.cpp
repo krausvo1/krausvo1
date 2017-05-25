@@ -109,8 +109,8 @@ bool CMenu::Load(){
 	}
 	else{
 
-		if(LoadGame(file)){
-			return true;
+		if(!LoadGame(file)){
+			Load();
 		}
 	}
 

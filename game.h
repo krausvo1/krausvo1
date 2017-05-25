@@ -24,16 +24,15 @@ public:
 
 	void SetExit();
 
-	bool CreateObject				(const char & object, const char & type, 
-					 				 const int & ypos,    const int & xpos,
-					 									  const int & maxwidth);
+	bool CreateObject				(const char & object,   const char & type, 
+					 				 const int & ypos,      const int & xpos,
+					 				 const int & maxheight, const int & maxwidth);
 
-	bool CreateTower(const char & type, const int & ypos, const int & xpos);
+	bool CreateTower(const char & type, const int & ypos, const int & xpos, const int & maxwidth);
 
-	bool CreateAttacker(const char & type, const int & ypos, const int & xpos);
+	bool CreateAttacker(const char & type, const int & ypos, const int & xpos, const int & maxwidth);
 	
-	bool CreateGate(const char & type, const int & ypos, const int & xpos,
-					const int & maxwidth);
+	bool CreateGate(const char & type, const int & ypos, const int & xpos, const int & maxwidth);
 
 private:
 	std::vector<CTower> v_towers;

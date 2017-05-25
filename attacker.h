@@ -3,6 +3,9 @@
 #ifndef ATTACKER_H
 #define ATTACKER_H
 
+#define MAX_H 30
+#define MAX_W 50
+
 class CAttacker
 {
 public:
@@ -11,8 +14,7 @@ public:
 	~CAttacker(){};
 	virtual void Move();
 	virtual void NewMove();
-
-
+	bool AssignPath(const CGate & gate);
 
 	char m_attacker_type;
 
