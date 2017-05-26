@@ -4,18 +4,12 @@
 
 CAttacker::CAttacker(const char & type, const CGate & start, const int & number):
 					m_attacker_type(type), m_ypos(start.m_ypos), m_xpos(start.m_xpos), //NEW
-					m_hit(false), m_health(60), m_number(number), m_start(start), m_moves(2){}
+					m_hit(false), m_health(60), m_number(number), m_start(start), m_moves(2), m_attacker_won(false){}
 
-CAttacker::CAttacker(const char & type, const int & ypos, const int & xpos, const int & number, const CGate & exit): //LOAD 
+CAttacker::CAttacker(const char & type, const int & ypos, const int & xpos, const int & number, const int & health): //LOAD 
 					m_attacker_type(type), m_ypos(ypos), m_xpos(xpos), 
-					m_hit(false), m_health(60), m_number(number), m_exit_gate(exit), m_start(CGate()),
-					m_moves(0){}
-
-void CAttacker::Move(){
-	move(m_ypos, m_xpos - 1);
-	addch(m_attacker_type);
-	m_xpos = m_xpos - 1;
-}
+					m_hit(false), m_health(health), m_number(number), m_start(CGate()),
+					m_moves(0), m_attacker_won(false){}
 
 void CAttacker::NewMove(){
 
@@ -36,5 +30,14 @@ bool CAttacker::AssignPath(const CGate & gate){
 			return true;
 		}
 	}
+	return false;
+}
+
+bool CAttacker::CheckWin(){
+	if(m_ypos == m_start.path[0].first && m_xpos == m_start.path[0].second){
+		m_attacker_won = true;
+		return true;
+	}
+
 	return false;
 }

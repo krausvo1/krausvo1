@@ -24,7 +24,8 @@ public:
 		 const std::vector<CAttacker> & attcks, const int & maxheight, const int & maxwidth,
 		 const CGate & exit);
 
-	~CMap();
+	~CMap(){}
+
 	void NextFrame (const int & maxheight, const int & maxwidth);
 
 	void AddAttacker (const CGate & gate);
@@ -36,14 +37,15 @@ public:
 	void PrintGates();
 	void PrintAttackers(const int & maxheight, const int & maxwidth);
 	void PrintLogs(const int & maxheight);
+	void SwitchLogs();
+
 
 	std::vector<CTower> towers;
 	std::vector<CGate> gates;
 	std::vector<CAttacker> attackers;
 	std::vector<TLog> logs;
 
-	int number_of_attacker = 0;
-	int m_attackers_alive = 0;
+	int m_attackers_alive;
 
 	const int m_maxheight;
 	const int m_maxwidth;
@@ -51,6 +53,10 @@ public:
 	CGate m_exit_gate;
 
 	std::vector<std::vector<int>> map;
+
+	int m_attackers_won;
+	bool m_logs_on;
+
 };
 
 

@@ -9,17 +9,14 @@
 class CAttacker
 {
 public:
-	CAttacker(const char & type, const int & ypos, const int & xpos, const int & number, const CGate & exit); //LOAD
+	CAttacker(const char & type, const int & ypos, const int & xpos, const int & number, const int & health); //LOAD
 	CAttacker(const char & type, const CGate & start, const int & number); //NEW
 	~CAttacker(){};
-	virtual void Move();
 	virtual void NewMove();
 	bool AssignPath(const CGate & gate);
+	bool CheckWin();
 
 	char m_attacker_type;
-
-	int m_xstart;
-	int m_ystart;
 
 	int m_ypos;
 	int m_xpos;
@@ -29,10 +26,10 @@ public:
 	int m_health;
 	int m_number;
 
-	CGate m_exit_gate;
 	CGate m_start;
 
 	int m_moves;
+	bool m_attacker_won;
 
 };
 

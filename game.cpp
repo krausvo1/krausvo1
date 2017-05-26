@@ -12,6 +12,10 @@
 #include "map.h"
 #include "game.h"
 
+CGame::CGame() : m_goal(0)
+{
+}
+
 void CGame::SetExit(){
 	for(unsigned int i = 0; i < v_gates.size(); i++){
 		if(v_gates[i].m_gate_type == '<'){
@@ -22,21 +26,30 @@ void CGame::SetExit(){
 	}
 }
 
+void CGame::SetGoal(){
+	m_goal = rand() % 10 + 1;
+}
+
 void CGame::StartGame(const int & maxheight, const int & maxwidth, CMap map){
 	nodelay(stdscr, true);
 
-	int c = 0;
+	SetGoal();
 
 	while(1){
 
 		map.NextFrame(maxheight, maxwidth);
 
 		move(maxheight-2,0);
-		printw("max W: %d, max H: %d, pokus: %d, pocet utocniku: %d, pocet bran: %d", 
-			maxwidth, maxheight, c++, map.m_attackers_alive, map.gates.size());
+		printw("Attackers alive: %d, attackes won: %d, goal: %d", 
+			map.m_attackers_alive, map.m_attackers_won, m_goal);
 
-		map.PrintLogs(maxheight);
-		map.logs.clear();
+		if(map.m_logs_on){
+			printw(", logs: ON");
+			map.PrintLogs(maxheight);
+		}
+		else
+			printw(", logs: OFF");
+
 
 		refresh();
 		clear();
@@ -44,6 +57,10 @@ void CGame::StartGame(const int & maxheight, const int & maxwidth, CMap map){
 
 		char choice = getch();
 		switch(choice){
+			case 'L':
+			case 'l':
+				map.SwitchLogs();
+				continue;
 			case 'Q':
 			case 'q':
 				return;
@@ -67,7 +84,6 @@ void CGame::StartGame(const int & maxheight, const int & maxwidth, CMap map){
 
 void CGame::NewGame(){
 	clear();
-	usleep(1500000);
 
 	int maxheight,maxwidth;
 	getmaxyx(stdscr,maxheight,maxwidth);
@@ -81,18 +97,15 @@ void CGame::NewGame(){
 	CTower tower3 ('I', maxheight-2, 8);
 	CTower tower7 ('T', maxheight-4, 7);
 	
-	CGate gate1 ('E', 4, maxwidth-2, 1);
-	CGate gate2 ('Q', maxheight-4, maxwidth-2, 2);
+	CGate gate1 ('1', 4, maxwidth-2, 1);
+	CGate gate2 ('2', maxheight-4, maxwidth-2, 2);
 	CGate gate3 ('<', maxheight-4, 1, 3);
 
-	// std::vector<CTower> v_towers;
 	v_towers.push_back(tower1);
 	v_towers.push_back(tower2);
 	v_towers.push_back(tower3);
 	v_towers.push_back(tower7);
 
-
-	// std::vector<CGate> v_gates;
 	v_gates.push_back(gate1);
 	v_gates.push_back(gate2);
 	v_gates.push_back(gate3);
@@ -111,6 +124,7 @@ bool CGame::LoadGame(ifstream & file){
 	char object, type;
 	int ypos, xpos;
 	int maxheight, maxwidth, maxheightLoaded, maxwidthLoaded;
+	int health = 0;
 
 	getmaxyx(stdscr, maxheight, maxwidth);
 
@@ -119,13 +133,16 @@ bool CGame::LoadGame(ifstream & file){
 	if(maxheight < maxheightLoaded || maxwidth < maxwidthLoaded)
 		return false;
 
-	int c = 0;
-	while(file >> object >> type >> ypos >> xpos){
-		c++;
+	int line = 0;
 		clear();
 
-		if(!CreateObject(object, type, ypos, xpos, maxheightLoaded, maxwidthLoaded)){
-			printw("Chyba v popisu objektu! (%d)", c);
+	while(file >> object >> type >> ypos >> xpos){
+
+		if(object == 'A')
+			file >> health;
+
+		if(!CreateObject(object, type, ypos, xpos, maxheightLoaded, maxwidthLoaded, health)){
+			printw("Error occured while reading data from the file, line: %d", line++);
 			refresh();
 			usleep(1000000);
 			return false;
@@ -153,7 +170,7 @@ bool CGame::LoadGame(ifstream & file){
 
 bool CGame::CreateObject(const char & object,    const char & type, 
 						 const int & ypos, 	     const int & xpos, 
-						 const int & maxheight,  const int & maxwidth){
+						 const int & maxheight,  const int & maxwidth, const int & health){
 	
 	if(ypos > maxheight - 4 || ypos < 1 || xpos > maxwidth - 2 || xpos < 1){
 		return false;
@@ -164,7 +181,7 @@ bool CGame::CreateObject(const char & object,    const char & type,
 			return CreateTower(type, ypos, xpos, maxwidth);
 			break;
 		case 'A':
-			return CreateAttacker(type, ypos, xpos, maxwidth);
+			return CreateAttacker(type, ypos, xpos, maxwidth, health);
 			break;
 		case 'G':
 			return CreateGate(type, ypos, xpos, maxwidth);
@@ -195,16 +212,16 @@ bool CGame::CreateTower(const char & type, const int & ypos,
 }
 
 bool CGame::CreateAttacker(const char & type, const int & ypos, 
-						   const int & xpos, const int & maxwidth){
+						   const int & xpos, const int & maxwidth, const int & health){
 
 	if(xpos == 1 || xpos == maxwidth - 2) return false;
 
 	switch(type){
 		case '@':
-			v_attackers.push_back(CAttacker(type, ypos, xpos, v_attackers.size(), m_exit_gate));
+			v_attackers.push_back(CAttacker(type, ypos, xpos, v_attackers.size(), health));
 			break;
 		case '&':
-			v_attackers.push_back(CAttacker(type, ypos, xpos, v_attackers.size(), m_exit_gate));
+			v_attackers.push_back(CAttacker(type, ypos, xpos, v_attackers.size(), health));
 			break;
 		default:
 			return false;

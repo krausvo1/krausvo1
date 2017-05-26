@@ -13,7 +13,7 @@ using namespace std;
 
 class CGame{
 public:
-	CGame(){};
+	CGame();
 	~CGame(){};
 
 	void NewGame();
@@ -23,14 +23,15 @@ public:
 	void StartGame(const int & maxheight, const int & maxwidth, CMap map);
 
 	void SetExit();
+	void SetGoal();
 
 	bool CreateObject				(const char & object,   const char & type, 
 					 				 const int & ypos,      const int & xpos,
-					 				 const int & maxheight, const int & maxwidth);
+					 				 const int & maxheight, const int & maxwidth, const int & health);
 
 	bool CreateTower(const char & type, const int & ypos, const int & xpos, const int & maxwidth);
 
-	bool CreateAttacker(const char & type, const int & ypos, const int & xpos, const int & maxwidth);
+	bool CreateAttacker(const char & type, const int & ypos, const int & xpos, const int & maxwidth, const int & health);
 	
 	bool CreateGate(const char & type, const int & ypos, const int & xpos, const int & maxwidth);
 
@@ -40,6 +41,8 @@ private:
 	std::vector<CAttacker> v_attackers;
 
 	CGate m_exit_gate;
+
+	int m_goal;
 };
 
 #endif

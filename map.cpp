@@ -9,8 +9,8 @@ using namespace std;
 
 CMap::CMap(const std::vector<CTower> & twrs, const std::vector<CGate> & gts, const int & maxheight, const int & maxwidth,
 		   const CGate & exit):
-		   towers(twrs), gates(gts), number_of_attacker(0), m_attackers_alive(0), m_maxheight(maxheight), m_maxwidth(maxwidth), 
-		   m_exit_gate(exit)
+		   towers(twrs), gates(gts), m_attackers_alive(0), m_maxheight(maxheight), m_maxwidth(maxwidth), 
+		   m_exit_gate(exit), m_attackers_won(0), m_logs_on(true)
 {
 	map.resize(maxheight);
 	for(int i = 0; i < maxheight; i++){
@@ -36,8 +36,8 @@ CMap::CMap(const std::vector<CTower> & twrs, const std::vector<CGate> & gts, con
 
 CMap::CMap(const std::vector<CTower> & twrs, const std::vector<CGate> & gts,
 		   const std::vector<CAttacker> & attcks, const int & maxheight, const int & maxwidth, const CGate & exit):
-		   towers(twrs), gates(gts), attackers(attcks), number_of_attacker(0), m_attackers_alive(0),
-		   m_maxheight(maxheight), m_maxwidth(maxwidth), m_exit_gate(exit)
+		   towers(twrs), gates(gts), attackers(attcks), m_attackers_alive(0),
+		   m_maxheight(maxheight), m_maxwidth(maxwidth), m_exit_gate(exit), m_attackers_won(0), m_logs_on(true)
 {
 	map.resize(maxheight);
 	for(int i = 0; i < maxheight; i++){
@@ -59,20 +59,21 @@ CMap::CMap(const std::vector<CTower> & twrs, const std::vector<CGate> & gts,
 			gates[i].path = FindPath(gates[i]);
 		}
 
-		if(attackers[i].AssignPath(gates[i])){
-			mvprintw(0,0,"Cesta pridana!, gate: %d, attacker: %d", gates[i].path.size(), attackers[i].m_start.path.size());
-			refresh();
-			usleep(1000000);
+		for(unsigned int j = 0; j < attackers.size(); j++){
+			if(attackers[j].m_start.path.empty() && attackers[j].AssignPath(gates[i])){
+				mvprintw(0,0,"Cesta pridana!, gate: %d, attacker: %d", gates[i].path.size(), attackers[j].m_start.path.size());
+				refresh();
+				usleep(1000000);
+			}
 		}
 	}	
 }
 
-CMap::~CMap(){
-	// for(int i = 0; i < m_maxheight; i++){
-	// 	delete [] map[i];
-	// }
-
-	// delete [] map;
+void CMap::SwitchLogs(){
+	if(m_logs_on)
+		m_logs_on = false;
+	else
+		m_logs_on = true;
 }
 
 vector<pair<int,int> > CMap::FindPath(CGate & start){
@@ -83,10 +84,10 @@ vector<pair<int,int> > CMap::FindPath(CGate & start){
 
 	temp.push_back(make_pair(y,x));
 	clear();
-	printw("start pos: %d,%d", y,x);
-	printw("\nend pos: %d,%d", m_exit_gate.m_ypos,m_exit_gate.m_xpos);
-	refresh();
-	usleep(1000000);
+	// printw("start pos: %d,%d", y,x);
+	// printw("\nend pos: %d,%d", m_exit_gate.m_ypos,m_exit_gate.m_xpos);
+	// refresh();
+	// usleep(1000000);
 
 	//očísluj
 	while(temp[0].first != m_exit_gate.m_ypos || temp[0].second != m_exit_gate.m_xpos){ 
@@ -149,9 +150,9 @@ vector<pair<int,int> > CMap::FindPath(CGate & start){
 	
 	path.push_back(make_pair(y,x));
 	clear();
-	printw("POnd pos: %d,%d", y,x);
-	refresh();
-	usleep(1000000);
+	// printw("POnd pos: %d,%d", y,x);
+	// refresh();
+	// usleep(1000000);
 	
 	int i = 0;
 
@@ -215,19 +216,8 @@ vector<pair<int,int> > CMap::FindPath(CGate & start){
 			usleep(10000);
 			continue;
 		}
-
-	// 	// if(!(i > path.size()) ){
-	// 	// 	// y = path[path.size() - 1].first;
-	// 	// 	// x = path[path.size() - 1].second;
-	// 	// 	y = path[i].first;
-	// 	// 	x = path[i].second;
-	// 	// }
-		printw("%d", i);
-		refresh();
 	}
-
-
-
+	
 	return path;
 }
 
@@ -278,22 +268,27 @@ void CMap::PrintGates(){
 
 
 void CMap::PrintAttackers(const int & maxheight, const int & maxwidth){
-	// use_default_colors();
 	start_color();
 	init_pair(1,COLOR_RED, COLOR_BLACK);
+	
 	m_attackers_alive = 0;
+	
 	for(unsigned int i=0; i < attackers.size(); i++){
 		if(attackers[i].m_hit){
-			logs.push_back(TLog(attackers[i].m_number, attackers[i].m_health));
+			if(m_logs_on)
+				logs.push_back(TLog(attackers[i].m_number, attackers[i].m_health));
+			
 			attackers[i].m_hit = false;
 			attron(COLOR_PAIR(1));
 		}
 
-		if(attackers[i].m_ypos != m_exit_gate.m_ypos)
-			if(attackers[i].m_health > 0){
-				attackers[i].NewMove();
-				m_attackers_alive++;
-			}
+		if(attackers[i].m_health > 0 && !attackers[i].m_attacker_won){
+			attackers[i].NewMove();
+			m_attackers_alive++;
+
+			if(attackers[i].CheckWin())
+				m_attackers_won++;
+		}
 
 
 		attroff(COLOR_PAIR(1));
@@ -311,7 +306,7 @@ void CMap::NextFrame (const int & maxheight, const int & maxwidth){
 				towers[t].v_targets.push_back(attackers[a]);
 		}
 
-		if(!towers[t].v_targets.empty()) //&& attackers[towers[t].ChooseTarget()].m_health != 0)
+		if(!towers[t].v_targets.empty())
 			towers[t].ShootAt(attackers[towers[t].ChooseTarget()]);
 
 		towers[t].v_targets.clear();
@@ -331,14 +326,15 @@ void CMap::AddAttacker (const CGate & start){
 	switch(attacker_type){
 		case 'B':
 		case 'b':
-			attackers.push_back(CAttacker('&', start, number_of_attacker));
-			number_of_attacker++;
+			attackers.push_back(CAttacker('&', start, attackers.size()));
 			m_attackers_alive++;
 			break;
 		case 'A':
 		case 'a':
-			attackers.push_back(CAttacker('@', start, number_of_attacker));
-			number_of_attacker++;
+			attackers.push_back(CAttacker('@', start, attackers.size()));
+			mvprintw(3,3,"ANO, %d", attackers.size());
+			refresh();
+			usleep(100000);
 			m_attackers_alive++;
 			break;
 		default:
@@ -356,4 +352,5 @@ void CMap::PrintLogs(const int & maxheight){
 		refresh();
 		usleep(3000000);
 	}
+	logs.clear();
 }
