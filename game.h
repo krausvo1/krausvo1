@@ -8,6 +8,7 @@
 #include "tower.h"
 #include "gate.h"
 #include "map.h"
+#include "border.h"
 
 using namespace std;
 
@@ -38,10 +39,14 @@ public:
 	
 	bool CreateGate(const char & type, const int & ypos, const int & xpos);
 
+	bool CreateBorder(const char & type, const int & ypos, const int & xpos);
+
+
 private:
 	std::vector<CTower> v_towers;
 	std::vector<CGate> v_gates;
 	std::vector<CAttacker> v_attackers;
+	std::vector<TBorder> v_borders;
 
 	CGate m_exit_gate;
 

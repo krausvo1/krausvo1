@@ -142,10 +142,13 @@ void CGame::NewGame(){
 	v_gates.push_back(gate2);
 	v_gates.push_back(gate3);
 
+	for(int i = 0; i < 10; i++)
+		v_borders.push_back(TBorder(i, 15));
+
 	SetExit();
 	SetGoal();
 
-	CMap map(v_towers, v_gates, m_maxheight, m_maxwidth, m_exit_gate);
+	CMap map(v_towers, v_gates, v_borders, m_maxheight, m_maxwidth, m_exit_gate);
 	
 	StartGame(map);
 	
@@ -191,7 +194,7 @@ bool CGame::LoadGame(ifstream & file){
 			file >> health;
 
 		if(!CreateObject(object, type, ypos, xpos, health)){
-			printw("Error occured while reading data from the file, line: %d", line++);
+			printw("Error occured while reading data from the file, line: %d", ++line);
 			refresh();
 			usleep(1000000);
 			return false;
@@ -204,7 +207,7 @@ bool CGame::LoadGame(ifstream & file){
 
 	SetExit();
 
-	CMap map(v_towers, v_gates, v_attackers, m_maxheight, m_maxwidth, m_exit_gate);
+	CMap map(v_towers, v_gates, v_attackers, v_borders, m_maxheight, m_maxwidth, m_exit_gate);
 	
 	StartGame(map);
 
@@ -213,7 +216,6 @@ bool CGame::LoadGame(ifstream & file){
 
 	return true;
 }
-
 
 
 
@@ -234,6 +236,9 @@ bool CGame::CreateObject(const char & object,    const char & type,
 			break;
 		case 'G':
 			return CreateGate(type, ypos, xpos);
+			break;
+		case 'B':
+			return CreateBorder(type, ypos, xpos);
 			break;
 		default:
 			return false;
@@ -259,8 +264,7 @@ bool CGame::CreateTower(const char & type, const int & ypos, const int & xpos){
 	return true;
 }
 
-bool CGame::CreateAttacker(const char & type, const int & ypos, 
-						   const int & xpos,  const int & health){
+bool CGame::CreateAttacker(const char & type, const int & ypos, const int & xpos,  const int & health){
 
 	if(xpos == 1 || xpos == m_maxwidth - 2) return false;
 
@@ -279,9 +283,18 @@ bool CGame::CreateAttacker(const char & type, const int & ypos,
 }
 
 bool CGame::CreateGate(const char & type, const int & ypos, const int & xpos){   										
-	if(xpos != 1 && xpos != m_maxwidth - 2) return false;
+	if((xpos != 1 && xpos != m_maxwidth - 2) || 
+	   (type != '<' && type != '1' && type != '2' && type != '3'))
+		return false;
 
 	v_gates.push_back(CGate(type, ypos, xpos, v_gates.size()+1));
+	return true;
+}
+
+bool CGame::CreateBorder(const char & type, const int & ypos, const int & xpos){
+	if(xpos == 1 || xpos == m_maxwidth - 2 || type != '#') return false;
+
+	v_borders.push_back(TBorder(ypos, xpos));
 	return true;
 }
 
@@ -300,7 +313,7 @@ void CGame::SaveGame(const CMap & map){
 	move(0,0);
 	
 	if(outputFile.is_open())
-		printw("Game saved! File name is \"%s\" %d", date, m_goal);
+		printw("Game saved! File name is \"%s\"", date);
 	else
 		printw("Error occured while saving the game!");
 
@@ -324,7 +337,14 @@ void CGame::SaveGame(const CMap & map){
 	}
 
 	for(unsigned int i = 0; i < map.attackers.size(); i++){
+		if(map.attackers[i].m_attacker_type == 'X')
+			continue;
+
 		outputFile << "A " << map.attackers[i].m_attacker_type << " " << map.attackers[i].m_ypos << " " << map.attackers[i].m_xpos << '\n';
 		outputFile << map.attackers[i].m_health << '\n';
+	}
+
+	for(unsigned int i = 0; i < map.borders.size(); i++){
+		outputFile << "B " << map.borders[i].t_ypos << " " << map.borders[i].t_xpos << '\n';
 	}
 }

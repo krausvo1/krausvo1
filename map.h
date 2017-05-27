@@ -5,6 +5,7 @@
 #include "tower.h"
 #include "gate.h"
 #include "attacker.h"
+#include "border.h"
 
 #ifndef MAP_H
 #define MAP_H
@@ -17,11 +18,11 @@ struct TLog{
 
 class CMap{
 public:
-	CMap(const std::vector<CTower> & twrs, const std::vector<CGate> & gts, 
+	CMap(const std::vector<CTower> & twrs, const std::vector<CGate> & gts, const std::vector<TBorder> & brdrs, 
 		 const int & maxheight, const int & maxwidth, const CGate & exit);
 	
 	CMap(const std::vector<CTower> & twrs, const std::vector<CGate> & gts,
-		 const std::vector<CAttacker> & attcks, const int & maxheight, const int & maxwidth,
+		 const std::vector<CAttacker> & attcks, const std::vector<TBorder> & brdrs, const int & maxheight, const int & maxwidth,
 		 const CGate & exit);
 
 	~CMap(){}
@@ -44,6 +45,7 @@ public:
 	std::vector<CGate> gates;
 	std::vector<CAttacker> attackers;
 	std::vector<TLog> logs;
+	std::vector<TBorder> borders;
 
 	int m_attackers_alive;
 

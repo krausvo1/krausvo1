@@ -7,9 +7,9 @@
 
 using namespace std;
 
-CMap::CMap(const std::vector<CTower> & twrs, const std::vector<CGate> & gts, const int & maxheight, const int & maxwidth,
+CMap::CMap(const std::vector<CTower> & twrs, const std::vector<CGate> & gts, const std::vector<TBorder> & brdrs, const int & maxheight, const int & maxwidth,
 		   const CGate & exit):
-		   towers(twrs), gates(gts), m_attackers_alive(0), m_maxheight(maxheight), m_maxwidth(maxwidth), 
+		   towers(twrs), gates(gts), borders(brdrs), m_attackers_alive(0), m_maxheight(maxheight), m_maxwidth(maxwidth), 
 		   m_exit_gate(exit), m_attackers_won(0), m_logs_on(true)
 {
 	map.resize(m_maxheight);
@@ -35,8 +35,9 @@ CMap::CMap(const std::vector<CTower> & twrs, const std::vector<CGate> & gts, con
 }
 
 CMap::CMap(const std::vector<CTower> & twrs, const std::vector<CGate> & gts,
-		   const std::vector<CAttacker> & attcks, const int & maxheight, const int & maxwidth, const CGate & exit):
-		   towers(twrs), gates(gts), attackers(attcks), m_attackers_alive(0),
+		   const std::vector<CAttacker> & attcks, const std::vector<TBorder> & brdrs, 
+		   const int & maxheight, const int & maxwidth, const CGate & exit):
+		   towers(twrs), gates(gts), attackers(attcks), borders(brdrs), m_attackers_alive(0),
 		   m_maxheight(maxheight), m_maxwidth(maxwidth), m_exit_gate(exit), m_attackers_won(0), m_logs_on(true)
 {
 	map.resize(m_maxheight);
@@ -246,6 +247,13 @@ void CMap::PrintBorders (const char & choice){
 		move(i,m_maxwidth-1);
 		if(choice != 'f')
 			map[i][m_maxwidth-1] = '#';
+		addch('#');
+	}
+
+	for(unsigned int i = 0; i < borders.size(); i++){
+		move(borders[i].t_ypos,borders[i].t_xpos);
+		if(choice != 'f')
+			map[borders[i].t_ypos][borders[i].t_xpos] = '#';
 		addch('#');
 	}
 }
