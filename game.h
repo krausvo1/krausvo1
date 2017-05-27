@@ -24,6 +24,7 @@ public:
 
 	void SetExit();
 	void SetGoal();
+	bool CheckVictory(const int & maxheight, const int & maxwidth, const int & attackers_won);
 
 	bool CreateObject				(const char & object,   const char & type, 
 					 				 const int & ypos,      const int & xpos,

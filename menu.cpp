@@ -36,31 +36,31 @@ void CMenu::Start(){
 	clear();
 
 	move(0,0);
-	char choice;
-	choice = getchar();
 
-	while(choice != 'N' && choice != 'n' && choice != 'L' && choice != 'l' &&
-		  choice != 'Q' && choice != 'q')
-		choice = getchar();
-		
-	switch(choice){
-		case 'N':
-		case 'n':
-			printw("New game started!");
-			usleep(1900000);
-			refresh();
-			NewGame();
-			break;
-		case 'L':
-		case 'l':
-			Load();
-			break;
-		case 'Q':
-		case 'q':
-			printw("Bye!");
-			refresh();
-			usleep(1900000);
-			break;
+	while(1){
+		switch(getchar()){
+			case 'N':
+			case 'n':
+				printw("New game started!");
+				refresh();
+				usleep(1900000);
+				NewGame();
+				break;
+			case 'L':
+			case 'l':
+				Load();
+				break;
+			case 'Q':
+			case 'q':
+				printw("Bye!");
+				refresh();
+				usleep(1900000);
+				break;
+			default:
+				continue;
+		}
+
+		break;
 	}
 
 	refresh();
@@ -71,7 +71,7 @@ bool CMenu::Load(){
 	printw("Load game - please type the exact name of the savefile (max. 100 characters)");
 	refresh();
 
-	move(1,0);
+	move(3,0);
 	echo();
 	curs_set(1);
 

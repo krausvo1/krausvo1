@@ -9,7 +9,7 @@ public:
 	~CTower(){};
 	virtual bool Shoot(CAttacker & attacker);
 	virtual void ShootAt(CAttacker & attacker);
-	bool InRange(const CAttacer & attacker);
+	bool InRange(const CAttacker & attacker);
 	int ChooseTarget();
 
 	

@@ -96,9 +96,9 @@ vector<pair<int,int> > CMap::FindPath(CGate & start){
 		if(y != 0 && map[y - 1][x] == 0){//y != 0 kvůli pozici -1
 			temp.push_back(make_pair(y-1,x));
 			map[y-1][x] = map[y][x] + 1;
-			move(y-1,x);
-			addch(map[y-1][x]);
-			refresh();
+			// move(y-1,x);
+			// addch(map[y-1][x]);
+			// refresh();
 			// usleep(19000);
 		}
 		
@@ -106,9 +106,9 @@ vector<pair<int,int> > CMap::FindPath(CGate & start){
 		if(x != 0 && map[y][x - 1] == 0){//x != 0 kvůli pozici -1
 			temp.push_back(make_pair(y,x-1));
 			map[y][x-1] = map[y][x] + 1;
-			move(y,x-1);
-			addch(map[y][x-1]);
-			refresh();
+			// move(y,x-1);
+			// addch(map[y][x-1]);
+			// refresh();
 			// usleep(19000);
 		}
 
@@ -116,9 +116,9 @@ vector<pair<int,int> > CMap::FindPath(CGate & start){
 		if(map[y + 1][x] == 0){
 			temp.push_back(make_pair(y+1,x));
 			map[y+1][x] = map[y][x] + 1;
-			move(y+1,x);
-			addch(map[y+1][x]);
-			refresh();
+			// move(y+1,x);
+			// addch(map[y+1][x]);
+			// refresh();
 			// usleep(19000);
 		}
 
@@ -126,9 +126,9 @@ vector<pair<int,int> > CMap::FindPath(CGate & start){
 		if(map[y][x+1] == 0){
 			temp.push_back(make_pair(y,x+1));
 			map[y][x+1] = map[y][x] + 1;
-			move(y,x+1);
-			addch(map[y][x+1]);
-			refresh();
+			// move(y,x+1);
+			// addch(map[y][x+1]);
+			// refresh();
 			// usleep(19000);
 		}
 
@@ -156,14 +156,15 @@ vector<pair<int,int> > CMap::FindPath(CGate & start){
 	
 	int i = 0;
 
-	for(int i = 0; i < m_maxheight-4; i++)
-		for(int j = 0; j < m_maxwidth; j++){
-			mvprintw(i,j,"%c",map[i][j]);
-			refresh();
-		}
-	usleep(1900000);
-	clear();
-	refresh();
+	// for(int i = 0; i < m_maxheight-4; i++)
+	// 	for(int j = 0; j < m_maxwidth; j++){
+	// 		mvprintw(i,j,"%c",map[i][j]);
+	// 		refresh();
+	// 	}
+	
+	// usleep(1900000);
+	// clear();
+	// refresh();
 	while(!(path[path.size()-1].first == start.m_ypos && path[path.size()-1].second == start.m_xpos)){ 
 		if(path.size()>1){
 			i++;
@@ -171,53 +172,53 @@ vector<pair<int,int> > CMap::FindPath(CGate & start){
 			// x = path[path.size() - 1].second;
 			y = path[path.size()-1].first;
 			x = path[path.size()-1].second;
-			mvprintw(0,0,"%d,%d",y,x);
-			refresh();
-			usleep(10000);
+			// mvprintw(0,0,"%d,%d",y,x);
+			// refresh();
+			// usleep(10000);
 
 		}
 
 		if(y!=0)
 		if(map[y - 1][x] == map[y][x] - 1){
 			path.push_back(make_pair(y-1,x));
-			move(y-1,x);
-			addch(map[y-1][x]);
-			refresh();
-			usleep(10000);
+			// move(y-1,x);
+			// addch(map[y-1][x]);
+			// refresh();
+			// usleep(10000);
 			continue;
 		}
 
 		if(x!=0)
 		if(map[y][x - 1] == map[y][x] - 1){
 			path.push_back(make_pair(y,x-1));
-			move(y,x-1);
-			addch(map[y][x-1]);
-			refresh();
-			usleep(10000);
+			// move(y,x-1);
+			// addch(map[y][x-1]);
+			// refresh();
+			// usleep(10000);
 			continue;
 		}
 
 		if(y!=m_maxheight-4)
 		if(map[y + 1][x] == map[y][x] - 1){
 			path.push_back(make_pair(y+1,x));
-			move(y+1,x);
-			addch(map[y+1][x]);
-			refresh();
-			usleep(10000);
+			// move(y+1,x);
+			// addch(map[y+1][x]);
+			// refresh();
+			// usleep(10000);
 			continue;
 		}
 		
 		if(x!=m_maxwidth-1)		
 		if(map[y][x+1] == map[y][x] - 1){
 			path.push_back(make_pair(y,x+1));
-			move(y,x+1);
-			addch(map[y][x+1]);
-			refresh();
-			usleep(10000);
+			// move(y,x+1);
+			// addch(map[y][x+1]);
+			// refresh();
+			// usleep(10000);
 			continue;
 		}
 	}
-	
+
 	return path;
 }
 

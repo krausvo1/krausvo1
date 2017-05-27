@@ -30,8 +30,25 @@ void CGame::SetGoal(){
 	m_goal = rand() % 10 + 1;
 }
 
+bool CGame::CheckVictory(const int & maxheight, const int & maxwidth, const int & attackers_won){
+	if(attackers_won == m_goal){
+		move((maxheight-3)/2, maxwidth/2 - 6);
+		attron(A_BOLD);
+		printw("VICTORY!");
+		move(((maxheight-3)/2)+1, maxwidth/2 - 6);
+		printw("Play again? [Y/N]");
+		attroff(A_BOLD); 
+		refresh();
+
+		return true;
+	}
+
+	return false;
+}
+
 void CGame::StartGame(const int & maxheight, const int & maxwidth, CMap map){
 	nodelay(stdscr, true);
+	srand(time(NULL));
 
 	SetGoal();
 
@@ -50,11 +67,30 @@ void CGame::StartGame(const int & maxheight, const int & maxwidth, CMap map){
 		else
 			printw(", logs: OFF");
 
+		
+		if(CheckVictory(maxheight, maxwidth, map.m_attackers_won)){
+			nodelay(stdscr, false);
+			while(1){
+				switch(getchar()){
+					case 'Y':
+					case 'y':
+						NewGame();
+						return;
+					case 'N':
+					case 'n':
+						return;
+					default:
+						continue;
+				};
+			}
+		}
 
+		
 		refresh();
 		clear();
 		usleep(300000);
 
+		
 		char choice = getch();
 		switch(choice){
 			case 'L':
@@ -84,6 +120,9 @@ void CGame::StartGame(const int & maxheight, const int & maxwidth, CMap map){
 
 void CGame::NewGame(){
 	clear();
+	v_towers.clear();
+	v_attackers.clear();
+	v_gates.clear();
 
 	int maxheight,maxwidth;
 	getmaxyx(stdscr,maxheight,maxwidth);
@@ -130,8 +169,13 @@ bool CGame::LoadGame(ifstream & file){
 
 	file >> maxheightLoaded >> maxwidthLoaded;
 
-	if(maxheight < maxheightLoaded || maxwidth < maxwidthLoaded)
-		return false;
+	if(maxheight < maxheightLoaded || maxwidth < maxwidthLoaded){
+		resizeterm(maxwidthLoaded, maxwidthLoaded);
+		clear();
+		printw("Widen the terminal window, please.");
+		refresh();
+		usleep(2000000);
+	}
 
 	int line = 0;
 		clear();
@@ -151,7 +195,7 @@ bool CGame::LoadGame(ifstream & file){
 
 	printw("Game loaded!");
 	refresh();
-	usleep(1000000);
+	usleep(1900000);
 
 	SetExit();
 
