@@ -12,7 +12,7 @@ public:
 	CAttacker(const char & type, const int & ypos, const int & xpos, const int & number, const int & health); //LOAD
 	CAttacker(const char & type, const CGate & start, const int & number); //NEW
 	~CAttacker(){};
-	virtual void NewMove();
+	virtual bool NewMove();
 	bool AssignPath(const CGate & gate);
 	bool CheckWin();
 

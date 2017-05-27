@@ -26,17 +26,17 @@ public:
 
 	~CMap(){}
 
-	void NextFrame (const int & maxheight, const int & maxwidth);
+	void NextFrame ();
 
 	void AddAttacker (const CGate & gate);
 
 	std::vector<std::pair<int,int>> FindPath(CGate & start);
 
-	void PrintBorders (const int & maxheight, const int & maxwidth, const char & choice);
+	void PrintBorders (const char & choice);
 	void PrintTowers();
 	void PrintGates();
-	void PrintAttackers(const int & maxheight, const int & maxwidth);
-	void PrintLogs(const int & maxheight);
+	void PrintAttackers();
+	void PrintLogs();
 	void SwitchLogs();
 
 

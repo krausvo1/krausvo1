@@ -20,23 +20,23 @@ public:
 
 	bool LoadGame(ifstream & file);
 
-	void StartGame(const int & maxheight, const int & maxwidth, CMap map);
+	void StartGame(CMap map);
 
-	void SaveGame(const CMap & map,const int & maxheight,  const int & maxwidth);
+	void SaveGame(const CMap & map);
 
 	void SetExit();
 	void SetGoal();
-	bool CheckVictory(const int & maxheight, const int & maxwidth, const int & attackers_won);
+	bool CheckVictory(const int & attackers_won);
 
 	bool CreateObject				(const char & object,   const char & type, 
 					 				 const int & ypos,      const int & xpos,
-					 				 const int & maxheight, const int & maxwidth, const int & health);
+					 				 						const int & health);
 
-	bool CreateTower(const char & type, const int & ypos, const int & xpos, const int & maxwidth);
+	bool CreateTower(const char & type, const int & ypos, const int & xpos);
 
-	bool CreateAttacker(const char & type, const int & ypos, const int & xpos, const int & maxwidth, const int & health);
+	bool CreateAttacker(const char & type, const int & ypos, const int & xpos, const int & health);
 	
-	bool CreateGate(const char & type, const int & ypos, const int & xpos, const int & maxwidth);
+	bool CreateGate(const char & type, const int & ypos, const int & xpos);
 
 private:
 	std::vector<CTower> v_towers;
@@ -46,6 +46,9 @@ private:
 	CGate m_exit_gate;
 
 	int m_goal;
+
+	int m_maxheight;
+	int m_maxwidth;
 };
 
 #endif

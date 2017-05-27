@@ -2,7 +2,7 @@
 #define MENU_H
 #include "game.h"
 
-class CMenu : public CGame{
+class CMenu : CGame{
 public:
 	CMenu();
 	~CMenu(){};

@@ -11,7 +11,10 @@ CAttacker::CAttacker(const char & type, const int & ypos, const int & xpos, cons
 					m_hit(false), m_health(health), m_number(number), m_start(CGate()),
 					m_moves(0), m_attacker_won(false){}
 
-void CAttacker::NewMove(){
+bool CAttacker::NewMove(){
+
+	if(m_health == 0)
+		m_attacker_type = 'X';
 
 	m_ypos = m_start.path[m_start.path.size() - m_moves].first;
 	m_xpos = m_start.path[m_start.path.size() - m_moves].second;	
@@ -20,6 +23,8 @@ void CAttacker::NewMove(){
 	addch(m_attacker_type);
 
 	m_moves++; //kolik pohybů attacker udělal
+
+	return m_health > 0;
 }
 
 bool CAttacker::AssignPath(const CGate & gate){
