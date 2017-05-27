@@ -161,7 +161,7 @@ vector<pair<int,int> > CMap::FindPath(CGate & start){
 	// 		mvprintw(i,j,"%c",map[i][j]);
 	// 		refresh();
 	// 	}
-	
+
 	// usleep(1900000);
 	// clear();
 	// refresh();
@@ -318,7 +318,7 @@ void CMap::NextFrame (const int & maxheight, const int & maxwidth){
 
 void CMap::AddAttacker (const CGate & start){
 	move(0,0);
-	printw("Gate %d, select attacker type - press B for basic attacker or press A for advanced attacker", start.m_gate_ID);
+	printw("Gate %d, select attacker type:\nPress B for basic attacker\nPress A for advanced attacker", start.m_gate_ID);
 	refresh();
 
 	nodelay(stdscr, false);
@@ -333,9 +333,6 @@ void CMap::AddAttacker (const CGate & start){
 		case 'A':
 		case 'a':
 			attackers.push_back(CAttacker('@', start, attackers.size()));
-			mvprintw(3,3,"ANO, %d", attackers.size());
-			refresh();
-			usleep(100000);
 			m_attackers_alive++;
 			break;
 		default:

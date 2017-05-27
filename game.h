@@ -22,6 +22,8 @@ public:
 
 	void StartGame(const int & maxheight, const int & maxwidth, CMap map);
 
+	void SaveGame(const CMap & map,const int & maxheight,  const int & maxwidth);
+
 	void SetExit();
 	void SetGoal();
 	bool CheckVictory(const int & maxheight, const int & maxwidth, const int & attackers_won);

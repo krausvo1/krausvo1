@@ -1,4 +1,5 @@
 #include <curses.h>
+#include <ctime>
 #include <iostream>
 #include <cstdlib>
 #include <unistd.h>
@@ -27,7 +28,7 @@ void CGame::SetExit(){
 }
 
 void CGame::SetGoal(){
-	m_goal = rand() % 10 + 1;
+	m_goal = rand() % 15 + 5;
 }
 
 bool CGame::CheckVictory(const int & maxheight, const int & maxwidth, const int & attackers_won){
@@ -49,8 +50,6 @@ bool CGame::CheckVictory(const int & maxheight, const int & maxwidth, const int 
 void CGame::StartGame(const int & maxheight, const int & maxwidth, CMap map){
 	nodelay(stdscr, true);
 	srand(time(NULL));
-
-	SetGoal();
 
 	while(1){
 
@@ -89,10 +88,9 @@ void CGame::StartGame(const int & maxheight, const int & maxwidth, CMap map){
 		refresh();
 		clear();
 		usleep(300000);
-
 		
-		char choice = getch();
-		switch(choice){
+		// char choice = getch();
+		switch(getch()){
 			case 'L':
 			case 'l':
 				map.SwitchLogs();
@@ -111,8 +109,10 @@ void CGame::StartGame(const int & maxheight, const int & maxwidth, CMap map){
 				if(map.gates.size() > 3)
 					map.AddAttacker(map.gates[2]);
 				continue;
-			// case 'S':
-			// case 's':
+			case 'S':
+			case 's':
+				SaveGame(map, maxheight, maxwidth);
+				continue;
 		}
 	}	
 }
@@ -126,10 +126,6 @@ void CGame::NewGame(){
 
 	int maxheight,maxwidth;
 	getmaxyx(stdscr,maxheight,maxwidth);
-
-	mvprintw(0,0,"%d,%d",maxheight,maxwidth);
-	refresh();
-	usleep(1500000);
 
 	CTower tower1 ('I', 10, 50);
 	CTower tower2 ('I', 4, 45);
@@ -150,6 +146,7 @@ void CGame::NewGame(){
 	v_gates.push_back(gate3);
 
 	SetExit();
+	SetGoal();
 
 	CMap map(v_towers, v_gates, maxheight, maxwidth, m_exit_gate);
 	
@@ -167,7 +164,7 @@ bool CGame::LoadGame(ifstream & file){
 
 	getmaxyx(stdscr, maxheight, maxwidth);
 
-	file >> maxheightLoaded >> maxwidthLoaded;
+	file >> maxheightLoaded >> maxwidthLoaded >> m_goal;
 
 	if(maxheight < maxheightLoaded || maxwidth < maxwidthLoaded){
 		resizeterm(maxwidthLoaded, maxwidthLoaded);
@@ -177,8 +174,16 @@ bool CGame::LoadGame(ifstream & file){
 		usleep(2000000);
 	}
 
-	int line = 0;
+	if(m_goal > 15 || m_goal < 5){
 		clear();
+		printw("Goal not in interval <5,15>, setting it to 15.");
+		refresh();
+		usleep(2000000);
+		m_goal = 15;
+	}
+
+	int line = 0;
+	clear();
 
 	while(file >> object >> type >> ypos >> xpos){
 
@@ -281,4 +286,48 @@ bool CGame::CreateGate(const char & type, const int & ypos, const int & xpos,
 
 	v_gates.push_back(CGate(type, ypos, xpos, v_gates.size()+1));
 	return true;
+}
+
+void CGame::SaveGame(const CMap & map,const int & maxheight, const int & maxwidth){
+	time_t t = time(0);
+	struct tm * now = localtime(&t);
+
+	char date[80];
+
+	strftime(date, 80, "%T %d-%m-%Y", now);
+	
+	ofstream outputFile;
+	outputFile.open(date);
+	
+	clear();
+	move(0,0);
+	
+	if(outputFile.is_open())
+		printw("Game saved! File name is \"%s\"", date);
+	else
+		printw("Error occured while saving the game!");
+
+	move(1,0);
+	printw("Press ANY key to continue");
+	refresh();
+
+	nodelay(stdscr, false);
+	getch();
+	nodelay(stdscr, true);
+	clear();
+
+	outputFile << maxheight << " " << maxwidth << " " << m_goal << '\n';
+
+	for(unsigned int i = 0; i < v_gates.size(); i++){
+		outputFile << "G " << v_gates[i].m_gate_type << " " <<v_gates[i].m_ypos << " " << v_gates[i].m_xpos << '\n';
+	}
+
+	for(unsigned int i = 0; i < v_towers.size(); i++){
+		outputFile << "T " << v_towers[i].m_tower_type << " " << v_towers[i].m_ypos << " " << v_towers[i].m_xpos << '\n';
+	}
+
+	for(unsigned int i = 0; i < map.attackers.size(); i++){
+		outputFile << "A " << map.attackers[i].m_attacker_type << " " << map.attackers[i].m_ypos << " " << map.attackers[i].m_xpos << '\n';
+		outputFile << map.attackers[i].m_health << '\n';
+	}
 }
