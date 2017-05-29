@@ -6,12 +6,13 @@
 class CAttacker
 {
 public:
-	CAttacker(const char & type, const int & ypos, const int & xpos, const int & number, const int & health); //LOAD
 	CAttacker(const char & type, const CGate & start, const int & number); //NEW
+	CAttacker(const char & type, const int & ypos, const int & xpos, const int & number, const int & health); //LOAD
 	~CAttacker(){};
-	virtual bool NewMove();
+	virtual bool Move();
 	bool AssignPath(const CGate & gate);
 	bool CheckWin();
+	virtual void TakeHit(const int & damage, const bool & stun);
 
 	char m_attacker_type;
 
@@ -27,6 +28,8 @@ public:
 
 	int m_moves;
 	bool m_attacker_won;
+
+	bool m_stunned; //nebude!
 
 };
 

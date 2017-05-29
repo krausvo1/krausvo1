@@ -7,32 +7,28 @@
 
 
 CTower::CTower(const char & tower_type, const int & ypos, const int & xpos):
-		   	   m_tower_type(tower_type),m_xpos(xpos),m_ypos(ypos), m_range(3){}
+		   	   m_tower_type(tower_type),m_xpos(xpos),m_ypos(ypos), m_range(2), m_stun_ready(true){}
 
-bool CTower::Shoot(CAttacker & attacker){
-	if(InRange(attacker)){
-		attacker.m_hit = true;
-		attacker.m_health -= 20;
-		return true;
-	}
-
-	return false;
-}
 
 bool CTower::InRange(const CAttacker & attacker){
-	for(int j = - 1; j < m_range - 1; j++)
-		for(int k = - 1; k < m_range - 1; k++)
+	for(int j = - 1; j < m_range; j++)
+		for(int k = - 1; k < m_range; k++)
 			if((m_ypos + j == attacker.m_ypos) && (m_xpos + k + 1 == attacker.m_xpos))
 				return true;
 
 	return false;
 }
 
-void CTower::ShootAt(CAttacker & attacker){
-	attacker.m_hit = true;
-	attacker.m_health -= 20;
-	// if(attacker.m_health == 0)
-	// 	attacker.m_dead = true;
+void CTower::Shoot(CAttacker & attacker){
+	// if(attacker.m_ypos == m_ypos - 2 || attacker.m_ypos == m_ypos + 2 || 
+	//    	attacker.m_xpos == m_xpos - 2 || attacker.m_xpos == m_xpos + 2 )
+	// {
+	// 	attacker.TakeHit(0, false);
+	// }
+	// else{
+		attacker.TakeHit(20, m_stun_ready);
+		m_stun_ready = false;
+	// }
 }
 
 int CTower::ChooseTarget(){
@@ -45,4 +41,8 @@ int CTower::ChooseTarget(){
 		return v_targets[0].m_number;
 
 	return 0;
+}
+
+void CTower::ChargeStun(){
+	m_stun_ready = true;
 }

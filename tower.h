@@ -7,15 +7,16 @@ class CTower{
 public:
 	CTower(const char & tower_type, const int & ypos, const int & xpos);
 	~CTower(){};
-	virtual bool Shoot(CAttacker & attacker);
-	virtual void ShootAt(CAttacker & attacker);
+	virtual void Shoot(CAttacker & attacker);
 	bool InRange(const CAttacker & attacker);
-	int ChooseTarget();
+	virtual int ChooseTarget();
+	void ChargeStun();
 
 	
 	char m_tower_type;
 	int m_xpos, m_ypos;
 	int m_range;
+	bool m_stun_ready; //ADVANCED
 
 	std::vector<CAttacker> v_targets;
 

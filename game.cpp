@@ -13,7 +13,9 @@
 #include "map.h"
 #include "game.h"
 
-CGame::CGame() : m_goal(0), m_maxheight(0), m_maxwidth(0){}
+CGame::CGame() : m_goal(0), m_maxheight(0), m_maxwidth(0){
+	srand(time(NULL));
+}
 
 void CGame::SetExit(){
 	for(unsigned int i = 0; i < v_gates.size(); i++){
@@ -47,7 +49,6 @@ bool CGame::CheckVictory(const int & attackers_won){
 
 void CGame::StartGame(CMap map){
 	nodelay(stdscr, true);
-	srand(time(NULL));
 
 	while(1){
 
@@ -81,7 +82,6 @@ void CGame::StartGame(CMap map){
 				};
 			}
 		}
-
 		
 		refresh();
 		clear();
@@ -126,7 +126,7 @@ void CGame::NewGame(){
 
 	CTower tower1 ('I', 10, 50);
 	CTower tower2 ('I', 4, 45);
-	CTower tower3 ('I', m_maxheight-2, 8);
+	CTower tower3 ('I', m_maxheight-4, 8);
 	CTower tower7 ('T', m_maxheight-4, 7);
 	
 	CGate gate1 ('1', 4, m_maxwidth-2, 1);
@@ -142,7 +142,7 @@ void CGame::NewGame(){
 	v_gates.push_back(gate2);
 	v_gates.push_back(gate3);
 
-	for(int i = 0; i < 10; i++)
+	for(int i = 1; i < 10; i++, i++)
 		v_borders.push_back(TBorder(i, 15));
 
 	SetExit();
@@ -179,7 +179,7 @@ bool CGame::LoadGame(ifstream & file){
 
 	if(m_goal > 15 || m_goal < 5){
 		clear();
-		printw("Goal not in interval <5,15>, setting it to 15.");
+		printw("Goal out of interval <5,15>, setting it to 15.");
 		refresh();
 		usleep(2000000);
 		m_goal = 15;
@@ -189,12 +189,14 @@ bool CGame::LoadGame(ifstream & file){
 	clear();
 
 	while(file >> object >> type >> ypos >> xpos){
-
-		if(object == 'A')
+		line++;
+		if(object == 'A'){
 			file >> health;
+			line++;
+		}
 
 		if(!CreateObject(object, type, ypos, xpos, health)){
-			printw("Error occured while reading data from the file, line: %d", ++line);
+			printw("Error occured while reading data from the file, line: %d", line);
 			refresh();
 			usleep(1000000);
 			return false;
@@ -305,7 +307,7 @@ void CGame::SaveGame(const CMap & map){
 
 	char date[80];
 
-	strftime(date, 80, "%T %d-%m-%Y", now);
+	strftime(date, 80, "%H%M%S-%d%m%Y", now);
 	
 	ofstream outputFile(date);
 	
@@ -345,6 +347,6 @@ void CGame::SaveGame(const CMap & map){
 	}
 
 	for(unsigned int i = 0; i < map.borders.size(); i++){
-		outputFile << "B " << map.borders[i].t_ypos << " " << map.borders[i].t_xpos << '\n';
+		outputFile << "B # " << map.borders[i].t_ypos << " " << map.borders[i].t_xpos << '\n';
 	}
 }

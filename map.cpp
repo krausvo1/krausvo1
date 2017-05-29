@@ -288,7 +288,7 @@ void CMap::PrintAttackers(){
 			attron(COLOR_PAIR(1));
 		}
 
-		if(!attackers[i].m_attacker_won && attackers[i].m_attacker_type != 'X' && attackers[i].NewMove()){
+		if(!attackers[i].m_attacker_won && attackers[i].m_attacker_type != 'X' && attackers[i].Move()){
 			m_attackers_alive++;
 
 			if(attackers[i].CheckWin())
@@ -311,7 +311,10 @@ void CMap::NextFrame (){
 		}
 
 		if(!towers[t].v_targets.empty())
-			towers[t].ShootAt(attackers[towers[t].ChooseTarget()]);
+			towers[t].Shoot(attackers[towers[t].ChooseTarget()]);
+		else
+			if(towers[t].m_tower_type == 'I')
+				towers[t].ChargeStun();
 
 		towers[t].v_targets.clear();
 	}
