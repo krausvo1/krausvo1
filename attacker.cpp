@@ -1,47 +1,16 @@
 #include "attacker.h"
-#include <curses.h>
-#include <unistd.h>
 
-CAttacker::CAttacker(const char & type, const CGate & start, const int & number):
+CAttacker::CAttacker(const char & type, const CGate & start, const int & number, const int & health, const bool & stunned):
 					m_attacker_type(type), m_ypos(start.m_ypos), m_xpos(start.m_xpos), //NEW
-					m_hit(false), m_health(60), m_number(number), m_start(start), m_moves(2), m_attacker_won(false), 
-					m_stunned(false){}
+					m_hit(false), m_health(health), m_number(number), m_start(start), m_moves(2), m_attacker_won(false), m_stunned(stunned){}
 	//m_health pryč!
 	///////
 
-CAttacker::CAttacker(const char & type, const int & ypos, const int & xpos, const int & number, const int & health): //LOAD 
+CAttacker::CAttacker(const char & type, const int & ypos, const int & xpos, const int & number, const int & health, const bool & stunned): //LOAD 
 					m_attacker_type(type), m_ypos(ypos), m_xpos(xpos), 
 					m_hit(false), m_health(health), m_number(number), m_start(CGate()),
-					m_moves(0), m_attacker_won(false), m_stunned(false){}
+					m_moves(0), m_attacker_won(false), m_stunned(stunned){}
 
-void CAttacker::TakeHit(const int & damage, const bool & stun){
-	m_hit = true;
-	m_health -= damage;
-	m_stunned = stun;
-}
-
-
-bool CAttacker::Move(){
-
-	if(m_health == 0)
-		m_attacker_type = 'X';
-
-	// if(m_stunned){
-	// 	move(m_ypos, m_xpos);
-	// 	addch(m_attacker_type);
-	// 	return 1;
-	// }
-
-	m_ypos = m_start.path[m_start.path.size() - m_moves].first;
-	m_xpos = m_start.path[m_start.path.size() - m_moves].second;	
-
-	move(m_ypos, m_xpos);
-	addch(m_attacker_type);
-
-	m_moves++; //kolik pohybů attacker udělal
-
-	return m_health > 0;
-}
 
 bool CAttacker::AssignPath(const CGate & gate){
 	for(unsigned int i = 0; i < gate.path.size(); i++){
@@ -61,4 +30,8 @@ bool CAttacker::CheckWin(){
 	}
 
 	return false;
+}
+
+bool CAttacker::IsAlive(){
+	return m_health > 0;
 }

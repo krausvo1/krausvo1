@@ -123,20 +123,15 @@ void CGame::NewGame(){
 	v_gates.clear();
 
 	getmaxyx(stdscr, m_maxheight, m_maxwidth);
-
-	CTower tower1 ('I', 10, 50);
-	CTower tower2 ('I', 4, 45);
-	CTower tower3 ('I', m_maxheight-4, 8);
-	CTower tower7 ('T', m_maxheight-4, 7);
 	
 	CGate gate1 ('1', 4, m_maxwidth-2, 1);
-	CGate gate2 ('2', m_maxheight-4, m_maxwidth-2, 2);
+	CGate gate2 ('2', 8, m_maxwidth-2, 2);
 	CGate gate3 ('<', m_maxheight-4, 1, 3);
 
-	v_towers.push_back(tower1);
-	v_towers.push_back(tower2);
-	v_towers.push_back(tower3);
-	v_towers.push_back(tower7);
+	v_towers.push_back(new CAdvancedTower (8, 50));
+	v_towers.push_back(new CBasicTower (4, 45));
+	v_towers.push_back(new CAdvancedTower (m_maxheight-4, 8));
+	v_towers.push_back(new CBasicTower (m_maxheight-4, 7));
 
 	v_gates.push_back(gate1);
 	v_gates.push_back(gate2);
@@ -160,7 +155,7 @@ bool CGame::LoadGame(ifstream & file){
 	char object, type;
 	int ypos, xpos;
 	int maxheightLoaded, maxwidthLoaded;
-	int health = 0;
+	int health = 0, stunned = false;
 
 	getmaxyx(stdscr, m_maxheight, m_maxwidth);
 
@@ -177,12 +172,12 @@ bool CGame::LoadGame(ifstream & file){
 	m_maxheight = maxheightLoaded;
 	m_maxwidth = maxwidthLoaded;
 
-	if(m_goal > 15 || m_goal < 5){
+	if(m_goal > 19 || m_goal < 5){
 		clear();
-		printw("Goal out of interval <5,15>, setting it to 15.");
+		printw("Goal out of interval <5,19>, setting it to 19.");
 		refresh();
 		usleep(2000000);
-		m_goal = 15;
+		m_goal = 19;
 	}
 
 	int line = 1;
@@ -191,11 +186,11 @@ bool CGame::LoadGame(ifstream & file){
 	while(file >> object >> type >> ypos >> xpos){
 		line++;
 		if(object == 'A'){
-			file >> health;
+			file >> health >> stunned;
 			line++;
 		}
 
-		if(!CreateObject(object, type, ypos, xpos, health)){
+		if(!CreateObject(object, type, ypos, xpos, health, stunned)){
 			printw("Error occured while reading data from the file, line: %d", line);
 			refresh();
 			usleep(1000000);
@@ -223,7 +218,7 @@ bool CGame::LoadGame(ifstream & file){
 
 bool CGame::CreateObject(const char & object,    const char & type, 
 						 const int & ypos, 	     const int & xpos, 
-						 						 const int & health){
+						 const int & health, 	 const bool & stunned){
 	
 	if(ypos > m_maxheight - 4 || ypos < 1 || xpos > m_maxwidth - 2 || xpos < 1){
 		return false;
@@ -234,7 +229,7 @@ bool CGame::CreateObject(const char & object,    const char & type,
 			return CreateTower(type, ypos, xpos);
 			break;
 		case 'A':
-			return CreateAttacker(type, ypos, xpos, health);
+			return CreateAttacker(type, ypos, xpos, health, stunned);
 			break;
 		case 'G':
 			return CreateGate(type, ypos, xpos);
@@ -254,10 +249,10 @@ bool CGame::CreateTower(const char & type, const int & ypos, const int & xpos){
 
 	switch(type){
 		case 'T':
-			v_towers.push_back(CTower(type, ypos, xpos));
+			v_towers.push_back(new CBasicTower(ypos, xpos));
 			break;
 		case 'I':
-			v_towers.push_back(CTower(type, ypos, xpos));
+			v_towers.push_back(new CAdvancedTower(ypos, xpos));
 			break;
 		default:
 			return false;
@@ -266,16 +261,16 @@ bool CGame::CreateTower(const char & type, const int & ypos, const int & xpos){
 	return true;
 }
 
-bool CGame::CreateAttacker(const char & type, const int & ypos, const int & xpos,  const int & health){
+bool CGame::CreateAttacker(const char & type, const int & ypos, const int & xpos,  const int & health, const bool & stunned){
 
 	if(xpos == 1 || xpos == m_maxwidth - 2) return false;
 
 	switch(type){
-		case '@':
-			v_attackers.push_back(CAttacker(type, ypos, xpos, v_attackers.size(), health));
-			break;
 		case '&':
-			v_attackers.push_back(CAttacker(type, ypos, xpos, v_attackers.size(), health));
+			v_attackers.push_back(new CBasicAttacker(ypos, xpos, v_attackers.size(), health, stunned));
+			break;
+		case '@':
+			v_attackers.push_back(new CAdvancedAttacker(ypos, xpos, v_attackers.size(), health));
 			break;
 		default:
 			return false;
@@ -335,15 +330,15 @@ void CGame::SaveGame(const CMap & map){
 	}
 
 	for(unsigned int i = 0; i < v_towers.size(); i++){
-		outputFile << "T " << v_towers[i].m_tower_type << " " << v_towers[i].m_ypos << " " << v_towers[i].m_xpos << '\n';
+		outputFile << "T " << v_towers[i]->m_tower_type << " " << v_towers[i]->m_ypos << " " << v_towers[i]->m_xpos << '\n';
 	}
 
 	for(unsigned int i = 0; i < map.attackers.size(); i++){
-		if(map.attackers[i].m_attacker_type == 'X')
+		if(map.attackers[i]->m_attacker_type == 'X')
 			continue;
 
-		outputFile << "A " << map.attackers[i].m_attacker_type << " " << map.attackers[i].m_ypos << " " << map.attackers[i].m_xpos << '\n';
-		outputFile << map.attackers[i].m_health << '\n';
+		outputFile << "A " << map.attackers[i]->m_attacker_type << " " << map.attackers[i]->m_ypos << " " << map.attackers[i]->m_xpos << '\n';
+		outputFile << map.attackers[i]->m_health << " " << map.attackers[i]->m_stunned << '\n';
 	}
 
 	for(unsigned int i = 0; i < map.borders.size(); i++){

@@ -1,4 +1,6 @@
 #include "gate.h"
+#include <curses.h>
+#include <unistd.h>
 
 #ifndef ATTACKER_H
 #define ATTACKER_H
@@ -6,13 +8,14 @@
 class CAttacker
 {
 public:
-	CAttacker(const char & type, const CGate & start, const int & number); //NEW
-	CAttacker(const char & type, const int & ypos, const int & xpos, const int & number, const int & health); //LOAD
+	CAttacker(const char & type, const CGate & start, const int & number, const int & health, const bool & stunned); //NEW
+	CAttacker(const char & type, const int & ypos, const int & xpos, const int & number, const int & health, const bool & stunned); //LOAD
 	~CAttacker(){};
-	virtual bool Move();
+	virtual bool Move() = 0;
 	bool AssignPath(const CGate & gate);
 	bool CheckWin();
-	virtual void TakeHit(const int & damage, const bool & stun);
+	bool IsAlive();
+	virtual void TakeHit(const int & damage, const bool & stun) = 0;
 
 	char m_attacker_type;
 
@@ -29,7 +32,7 @@ public:
 	int m_moves;
 	bool m_attacker_won;
 
-	bool m_stunned; //nebude!
+	bool m_stunned;
 
 };
 

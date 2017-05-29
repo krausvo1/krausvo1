@@ -1,27 +1,30 @@
 #include "basicA.h"
 
-CBasicAttacker::CBasicAttacker(const char & type, const int & ypos, const int & xpos, const int & number, const int & health):
-							   CAttacker(type, ypos, xpos, number, health), m_attacker_type('&'), m_stunned(false){} //LOAD
+CBasicAttacker::CBasicAttacker(const int & ypos, const int & xpos, const int & number, const int & health, const bool & stunned):
+							   CAttacker('&', ypos, xpos, number, health, stunned){} //LOAD
 
 
-CBasicAttacker::CBasicAttacker(const char & type, const CGate & start, const int & number):
-							   CAttacker(type, start, number), m_attacker_type('&'), m_health(100), m_stunned(false){} //NEW
+CBasicAttacker::CBasicAttacker(const CGate & start, const int & number):
+							   CAttacker('&', start, number, 150, false){} //NEW
 
 
-virtual void CBasicAttacker::TakeHit(const int & damage, const bool & stun){
+void CBasicAttacker::TakeHit(const int & damage, const bool & stun){
 	m_hit = true;
 	m_health -= damage;
 	m_stunned = stun;
 }
 
 
-virtual bool CBasicAttacker::Move(){
-	if(m_health == 0)
+bool CBasicAttacker::Move(){
+	if(!(m_health > 0))
 		m_attacker_type = 'X';
 
 	if(m_stunned){
-		move(m_ypos, m_xpos);
+		init_pair(2,COLOR_YELLOW, COLOR_BLACK);
+		attron(COLOR_PAIR(2));
+		move(m_start.path[m_start.path.size() - m_moves].first,  m_start.path[m_start.path.size() - m_moves].second);
 		addch(m_attacker_type);
+		attroff(COLOR_PAIR(2));
 		return 1;
 	}
 

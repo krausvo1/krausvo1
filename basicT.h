@@ -6,12 +6,14 @@
 
 class CBasicTower : public CTower{
 public:
-	CBasicTower(const char & tower_type, const int & ypos, const int & xpos);
+	CBasicTower(const int & ypos, const int & xpos);
 	~CBasicTower(){};
 
 	virtual void Shoot(CAttacker & attacker);
 	virtual int ChooseTarget();
-}
+	virtual bool InRange(const CAttacker & attacker);
+
+};
 
 
 #endif

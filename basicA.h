@@ -4,8 +4,8 @@
 
 class CBasicAttacker : public CAttacker{
 public:
-	CBasicAttacker(const char & type, const int & ypos, const int & xpos, const int & number, const int & health); //LOAD
-	CBasicAttacker(const char & type, const CGate & start, const int & number); //NEW
+	CBasicAttacker(const int & ypos, const int & xpos, const int & number, const int & health, const bool & stunned); //LOAD
+	CBasicAttacker(const CGate & start, const int & number); //NEW
 	~CBasicAttacker(){};
 
 	virtual void TakeHit(const int & damage, const bool & stun);
@@ -13,6 +13,6 @@ public:
 
 private:
 	bool m_stunned;
-}
+};
 
 #endif

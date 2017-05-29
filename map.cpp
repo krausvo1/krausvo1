@@ -7,7 +7,7 @@
 
 using namespace std;
 
-CMap::CMap(const std::vector<CTower> & twrs, const std::vector<CGate> & gts, const std::vector<TBorder> & brdrs, const int & maxheight, const int & maxwidth,
+CMap::CMap(const std::vector<CTower*> & twrs, const std::vector<CGate> & gts, const std::vector<TBorder> & brdrs, const int & maxheight, const int & maxwidth,
 		   const CGate & exit):
 		   towers(twrs), gates(gts), borders(brdrs), m_attackers_alive(0), m_maxheight(maxheight), m_maxwidth(maxwidth), 
 		   m_exit_gate(exit), m_attackers_won(0), m_logs_on(true)
@@ -23,7 +23,7 @@ CMap::CMap(const std::vector<CTower> & twrs, const std::vector<CGate> & gts, con
 				map[i][j] = 0;
 
 		for(unsigned int i = 0; i < towers.size(); i++){
-			map[towers[i].m_ypos][towers[i].m_xpos] = -8;
+			map[towers[i]->m_ypos][towers[i]->m_xpos] = -8;
 		}
 
 		PrintBorders('m');
@@ -34,8 +34,8 @@ CMap::CMap(const std::vector<CTower> & twrs, const std::vector<CGate> & gts, con
 	}
 }
 
-CMap::CMap(const std::vector<CTower> & twrs, const std::vector<CGate> & gts,
-		   const std::vector<CAttacker> & attcks, const std::vector<TBorder> & brdrs, 
+CMap::CMap(const std::vector<CTower*> & twrs, const std::vector<CGate> & gts,
+		   const std::vector<CAttacker*> & attcks, const std::vector<TBorder> & brdrs, 
 		   const int & maxheight, const int & maxwidth, const CGate & exit):
 		   towers(twrs), gates(gts), attackers(attcks), borders(brdrs), m_attackers_alive(0),
 		   m_maxheight(maxheight), m_maxwidth(maxwidth), m_exit_gate(exit), m_attackers_won(0), m_logs_on(true)
@@ -51,7 +51,7 @@ CMap::CMap(const std::vector<CTower> & twrs, const std::vector<CGate> & gts,
 				map[i][j] = 0;
 
 		for(unsigned int i = 0; i < towers.size(); i++){
-			map[towers[i].m_ypos][towers[i].m_xpos] = -8;
+			map[towers[i]->m_ypos][towers[i]->m_xpos] = -8;
 		}
 
 		PrintBorders('m');
@@ -61,8 +61,8 @@ CMap::CMap(const std::vector<CTower> & twrs, const std::vector<CGate> & gts,
 		}
 
 		for(unsigned int j = 0; j < attackers.size(); j++){
-			if(attackers[j].m_start.path.empty())
-				attackers[j].AssignPath(gates[i]);
+			if(attackers[j]->m_start.path.empty())
+				attackers[j]->AssignPath(gates[i]);
 		}
 	}	
 }
@@ -260,8 +260,8 @@ void CMap::PrintBorders (const char & choice){
 
 void CMap::PrintTowers(){
 	for(unsigned int i = 0; i < towers.size(); i++){
-		move(towers[i].m_ypos, towers[i].m_xpos);
-		addch(towers[i].m_tower_type);
+		move(towers[i]->m_ypos, towers[i]->m_xpos);
+		addch(towers[i]->m_tower_type);
 	}
 }
 
@@ -280,18 +280,18 @@ void CMap::PrintAttackers(){
 	m_attackers_alive = 0;
 	
 	for(unsigned int i=0; i < attackers.size(); i++){
-		if(attackers[i].m_hit){
+		if(attackers[i]->m_hit){
 			if(m_logs_on)
-				logs.push_back(TLog(attackers[i].m_number, attackers[i].m_health));
+				logs.push_back(TLog(attackers[i]->m_number, attackers[i]->m_health));
 			
-			attackers[i].m_hit = false;
+			attackers[i]->m_hit = false;
 			attron(COLOR_PAIR(1));
 		}
 
-		if(!attackers[i].m_attacker_won && attackers[i].m_attacker_type != 'X' && attackers[i].Move()){
+		if(!attackers[i]->m_attacker_won && attackers[i]->m_attacker_type != 'X' && attackers[i]->Move()){
 			m_attackers_alive++;
 
-			if(attackers[i].CheckWin())
+			if(attackers[i]->CheckWin())
 				m_attackers_won++;
 		}
 
@@ -306,17 +306,17 @@ void CMap::NextFrame (){
 
 	for(unsigned int t = 0; t < towers.size(); t++){
 		for(unsigned int a = 0; a < attackers.size(); a++){
-			if(towers[t].InRange(attackers[a]) && attackers[a].m_health > 0)
-				towers[t].v_targets.push_back(attackers[a]);
+			if(towers[t]->InRange(*attackers[a]) && attackers[a]->IsAlive())
+				towers[t]->v_targets.push_back(attackers[a]);
 		}
 
-		if(!towers[t].v_targets.empty())
-			towers[t].Shoot(attackers[towers[t].ChooseTarget()]);
+		if(!towers[t]->v_targets.empty())
+			towers[t]->Shoot(*attackers[towers[t]->ChooseTarget()]);
 		else
-			if(towers[t].m_tower_type == 'I')
-				towers[t].ChargeStun();
+			if(towers[t]->m_tower_type == 'I')
+				towers[t]->ChargeStun();
 
-		towers[t].v_targets.clear();
+		towers[t]->v_targets.clear();
 	}
 
 	PrintAttackers();
@@ -328,17 +328,17 @@ void CMap::AddAttacker (const CGate & start){
 	refresh();
 
 	nodelay(stdscr, false);
-	char attacker_type = getch();
+	// char attacker_type = getch();
 
-	switch(attacker_type){
+	switch(getch()){
 		case 'B':
 		case 'b':
-			attackers.push_back(CAttacker('&', start, attackers.size()));
+			attackers.push_back(new CBasicAttacker(start, attackers.size()));
 			m_attackers_alive++;
 			break;
 		case 'A':
 		case 'a':
-			attackers.push_back(CAttacker('@', start, attackers.size()));
+			attackers.push_back(new CAdvancedAttacker(start, attackers.size()));
 			m_attackers_alive++;
 			break;
 		default:
@@ -350,11 +350,19 @@ void CMap::AddAttacker (const CGate & start){
 }
 
 void CMap::PrintLogs(){
+	int health;
+
 	for(unsigned int i = 0; i < logs.size(); i++){
+		if(!(logs[i].t_health > 0))
+			health = 0;
+		else
+			health = logs[i].t_health;
+
 		move(m_maxheight-1,0);
-		printw("Attacker %d hit, remaining health: %d", logs[i].t_number, logs[i].t_health);
+		printw("Attacker %d hit, remaining health: %d", logs[i].t_number, health);
 		refresh();
 		usleep(3000000);
 	}
+
 	logs.clear();
 }

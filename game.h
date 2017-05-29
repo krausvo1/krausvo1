@@ -4,8 +4,10 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
-#include "attacker.h"
-#include "tower.h"
+#include "basicT.h"
+#include "advancedT.h"
+#include "basicA.h"
+#include "advancedA.h"
 #include "gate.h"
 #include "map.h"
 #include "border.h"
@@ -31,11 +33,11 @@ public:
 
 	bool CreateObject				(const char & object,   const char & type, 
 					 				 const int & ypos,      const int & xpos,
-					 				 						const int & health);
+					 				 const int & health, 	const bool & stunned);
 
 	bool CreateTower(const char & type, const int & ypos, const int & xpos);
 
-	bool CreateAttacker(const char & type, const int & ypos, const int & xpos, const int & health);
+	bool CreateAttacker(const char & type, const int & ypos, const int & xpos, const int & health, const bool & stunned);
 	
 	bool CreateGate(const char & type, const int & ypos, const int & xpos);
 
@@ -43,9 +45,9 @@ public:
 
 
 private:
-	std::vector<CTower> v_towers;
+	std::vector<CTower*> v_towers;
 	std::vector<CGate> v_gates;
-	std::vector<CAttacker> v_attackers;
+	std::vector<CAttacker*> v_attackers;
 	std::vector<TBorder> v_borders;
 
 	CGate m_exit_gate;
