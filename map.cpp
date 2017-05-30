@@ -282,17 +282,19 @@ void CMap::PrintAttackers(){
 	for(unsigned int i=0; i < attackers.size(); i++){
 		if(attackers[i]->m_hit){
 			if(m_logs_on)
-				logs.push_back(TLog(attackers[i]->m_number, attackers[i]->m_health));
+				logs.push_back(TLog(attackers[i]->m_number, attackers[i]->m_health, attackers[i]->m_ypos, attackers[i]->m_xpos));
 			
 			attackers[i]->m_hit = false;
 			attron(COLOR_PAIR(1));
 		}
 
 		if(!attackers[i]->m_attacker_won && attackers[i]->m_attacker_type != 'X' && attackers[i]->Move()){
-			m_attackers_alive++;
-
-			if(attackers[i]->CheckWin())
+			if(attackers[i]->CheckWin()){
 				m_attackers_won++;
+			}
+			else
+				m_attackers_alive++;
+
 		}
 
 		attroff(COLOR_PAIR(1));
@@ -305,10 +307,9 @@ void CMap::NextFrame (){
 	PrintGates();
 
 	for(unsigned int t = 0; t < towers.size(); t++){
-		for(unsigned int a = 0; a < attackers.size(); a++){
-			if(towers[t]->InRange(*attackers[a]) && attackers[a]->IsAlive())
+		for(unsigned int a = 0; a < attackers.size(); a++)
+			if(towers[t]->InRange(*attackers[a]))
 				towers[t]->v_targets.push_back(attackers[a]);
-		}
 
 		if(!towers[t]->v_targets.empty())
 			towers[t]->Shoot(*attackers[towers[t]->ChooseTarget()]);
@@ -359,7 +360,7 @@ void CMap::PrintLogs(){
 			health = logs[i].t_health;
 
 		move(m_maxheight-1,0);
-		printw("Attacker %d hit, remaining health: %d", logs[i].t_number, health);
+		printw("Attacker %d hit, remaining health: %d, pos: %d,%d", logs[i].t_number, health, logs[i].ypos, logs[i].xpos);
 		refresh();
 		usleep(3000000);
 	}

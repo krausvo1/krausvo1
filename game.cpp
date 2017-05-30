@@ -7,6 +7,7 @@
 #include <cstring>
 #include <fstream>
 #include <vector>
+#include <random>
 #include "tower.h"
 #include "gate.h"
 #include "attacker.h"
@@ -31,6 +32,13 @@ void CGame::SetGoal(){
 	m_goal = rand() % 15 + 5;
 }
 
+void CGame::AssignBorders(){
+	for(unsigned int i = 0; i < v_towers.size(); i++){
+			v_towers[i]->v_borders = v_borders;
+			v_towers[i]->CheckRange();
+	}
+}
+
 bool CGame::CheckVictory(const int & attackers_won){
 	if(attackers_won == m_goal){
 		move((m_maxheight-3)/2, m_maxwidth/2 - 6);
@@ -49,6 +57,8 @@ bool CGame::CheckVictory(const int & attackers_won){
 
 void CGame::StartGame(CMap map){
 	nodelay(stdscr, true);
+
+	AssignBorders();
 
 	while(1){
 
@@ -69,7 +79,7 @@ void CGame::StartGame(CMap map){
 		if(CheckVictory(map.m_attackers_won)){
 			nodelay(stdscr, false);
 			while(1){
-				switch(getchar()){
+				switch(getch()){
 					case 'Y':
 					case 'y':
 						NewGame();
@@ -87,7 +97,6 @@ void CGame::StartGame(CMap map){
 		clear();
 		usleep(300000);
 		
-		// char choice = getch();
 		switch(getch()){
 			case 'L':
 			case 'l':
@@ -121,15 +130,24 @@ void CGame::NewGame(){
 	v_towers.clear();
 	v_attackers.clear();
 	v_gates.clear();
+	v_borders.clear();
 
 	getmaxyx(stdscr, m_maxheight, m_maxwidth);
+	std::random_device rd;
+	std::mt19937 eng(rd());
+	std::uniform_int_distribution<int> rozmezi_vyska(m_maxheight - 10,m_maxheight - 6);
+	std::uniform_int_distribution<int> rozmezi_sirka(1, m_maxwidth-4);
+	std::uniform_int_distribution<int> rozmezi(6, 13);
+	std::uniform_int_distribution<int> rozsudek(1, 10);
+
 	
 	CGate gate1 ('1', 4, m_maxwidth-2, 1);
 	CGate gate2 ('2', 8, m_maxwidth-2, 2);
-	CGate gate3 ('<', m_maxheight-4, 1, 3);
+	CGate gate3 ('<', 4, 1, 3);
 
 	v_towers.push_back(new CAdvancedTower (8, 50));
-	v_towers.push_back(new CBasicTower (4, 45));
+	v_towers.push_back(new CAdvancedTower (4, 45));
+	v_towers.push_back(new CBasicTower (3, 25));
 	v_towers.push_back(new CAdvancedTower (m_maxheight-4, 8));
 	v_towers.push_back(new CBasicTower (m_maxheight-4, 7));
 
@@ -137,8 +155,34 @@ void CGame::NewGame(){
 	v_gates.push_back(gate2);
 	v_gates.push_back(gate3);
 
-	for(int i = 1; i < 10; i++, i++)
-		v_borders.push_back(TBorder(i, 15));
+	v_borders.push_back(TBorder(4,25));
+	v_borders.push_back(TBorder(3,26));
+
+	v_borders.push_back(TBorder(4,46));
+
+
+
+
+
+	// int random = rozmezi(eng);
+	// for(int i = 1; i < m_maxwidth-6;i++){
+	// 	if(i == random){
+	// 		int dylka_zdi = rozmezi_vyska(eng);
+	// 		if(rozsudek(eng) % 2 == 0){
+	// 			for(int j = 1; j < dylka_zdi; j++){
+	// 				v_borders.push_back(TBorder(j, i));
+	// 			}
+	// 		}
+	// 		else
+	// 			for(int j = m_maxheight - 4; j > m_maxheight - 4 - dylka_zdi; j--)
+	// 				v_borders.push_back(TBorder(j, i));
+
+			
+			
+	// 		random += rozmezi(eng);
+	// 	}
+	// }
+
 
 	SetExit();
 	SetGoal();

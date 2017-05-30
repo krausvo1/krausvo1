@@ -30,6 +30,8 @@ public:
 	void SetExit();
 	void SetGoal();
 	bool CheckVictory(const int & attackers_won);
+	void AssignBorders();
+
 
 	bool CreateObject				(const char & object,   const char & type, 
 					 				 const int & ypos,      const int & xpos,

@@ -32,6 +32,6 @@ bool CAttacker::CheckWin(){
 	return false;
 }
 
-bool CAttacker::IsAlive(){
+bool CAttacker::IsAlive() const{
 	return m_health > 0;
 }

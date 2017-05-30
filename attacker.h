@@ -14,13 +14,16 @@ public:
 	virtual bool Move() = 0;
 	bool AssignPath(const CGate & gate);
 	bool CheckWin();
-	bool IsAlive();
+	bool IsAlive() const;
 	virtual void TakeHit(const int & damage, const bool & stun) = 0;
 
 	char m_attacker_type;
 
 	int m_ypos;
 	int m_xpos;
+
+	int real_ypos;
+	int real_xpos;
 
 	bool m_hit;
 

@@ -29,12 +29,15 @@ bool CBasicAttacker::Move(){
 	}
 
 	m_ypos = m_start.path[m_start.path.size() - m_moves].first;
-	m_xpos = m_start.path[m_start.path.size() - m_moves].second;	
+	m_xpos = m_start.path[m_start.path.size() - m_moves].second;
 
 	move(m_ypos, m_xpos);
 	addch(m_attacker_type);
 
 	m_moves++; //kolik pohybů attacker udělal
+
+	real_ypos = m_start.path[m_start.path.size() - m_moves].first;
+	real_xpos = m_start.path[m_start.path.size() - m_moves].second;
 
 	return m_health > 0;
 }

@@ -6,34 +6,18 @@
 #include <unistd.h>
 
 
-CTower::CTower(const char & type, const int & ypos, const int & xpos, const int & range):
-		   	   m_tower_type(type), m_ypos(ypos), m_xpos(xpos), m_range(range){}
+CTower::CTower(const char & type, const int & ypos, const int & xpos):
+		   	   m_tower_type(type), m_ypos(ypos), m_xpos(xpos), m_range(2){}
 
+bool CTower::ClearShot(const CAttacker & attacker) const{
+	for(unsigned int i = 0; i < v_blind_spots.size(); i++)
+		if(attacker.m_ypos == v_blind_spots[i].first && attacker.m_xpos == v_blind_spots[i].second){
+			move(20, 40);
+			printw("SLEPE MISTO");
+			refresh();
+			usleep(1000000);
+			return false;
+		}
 
-// void CTower::Shoot(CAttacker & attacker){
-// 	// if(attacker.m_ypos == m_ypos - 2 || attacker.m_ypos == m_ypos + 2 || 
-// 	//    	attacker.m_xpos == m_xpos - 2 || attacker.m_xpos == m_xpos + 2 )
-// 	// {
-// 	// 	attacker.TakeHit(0, false);
-// 	// }
-// 	// else{
-// 		attacker.TakeHit(20, m_stun_ready);
-// 		m_stun_ready = false;
-// 	// }
-// }
-
-// int CTower::ChooseTarget(){
-// 	for(unsigned int i = 0; i < v_targets.size(); i++){
-// 		if(v_targets[i].m_attacker_type == '@')
-// 			return v_targets[i].m_number;
-// 	}
-
-// 	if(!v_targets.empty())
-// 		return v_targets[0].m_number;
-
-// 	return 0;
-// }
-
-// void CTower::ChargeStun(){
-// 	m_stun_ready = true;
-// }
+	return true;	
+}

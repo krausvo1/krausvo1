@@ -10,8 +10,10 @@ public:
 	~CBasicTower(){};
 
 	virtual void Shoot(CAttacker & attacker);
-	virtual int ChooseTarget();
-	virtual bool InRange(const CAttacker & attacker);
+	virtual int ChooseTarget() const;
+	virtual bool InRange(const CAttacker & attacker) const;
+	virtual void CheckRange();
+
 
 };
 

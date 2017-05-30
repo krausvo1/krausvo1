@@ -25,5 +25,9 @@ bool CAdvancedAttacker::Move(){
 
 	m_moves++; //kolik pohybů attacker udělal
 
+	real_ypos = m_start.path[m_start.path.size() - m_moves].first;
+	real_xpos = m_start.path[m_start.path.size() - m_moves].second;
+
+
 	return m_health > 0;
 }
