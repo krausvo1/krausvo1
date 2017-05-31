@@ -68,11 +68,6 @@ CMap::CMap(const std::vector<CTower*> & towers, const std::vector<CGate> & gates
 }
 
 CMap::~CMap(){
-	for(unsigned int i = 0; i < v_towers.size(); i++)
-          delete v_towers[i];
-
-    v_towers.clear();
-
     for(unsigned int i = 0; i < v_attackers.size(); i++)
           delete v_attackers[i];
 

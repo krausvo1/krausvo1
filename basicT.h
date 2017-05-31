@@ -7,7 +7,7 @@
 class CBasicTower : public CTower{
 public:
 	CBasicTower(const int & ypos, const int & xpos);
-	~CBasicTower(){};
+	virtual ~CBasicTower(){};
 
 	virtual void Shoot(CAttacker & attacker);
 	virtual int ChooseTarget() const;

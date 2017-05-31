@@ -3,6 +3,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <algorithm>
 #include <vector>
 #include "basicT.h"
 #include "advancedT.h"
@@ -17,7 +18,7 @@ using namespace std;
 class CGame{
 public:
 	CGame();
-	~CGame(){};
+	~CGame();
 
 	void NewGame();
 
@@ -29,6 +30,9 @@ public:
 
 	void SetExit();
 	void SetGoal();
+	void CheckGoal();
+	void CheckResolution(const int & maxheightLoaded, const int & maxwidthLoaded);
+
 	bool CheckVictory(const int & attackers_won);
 	void AssignBorders();
 

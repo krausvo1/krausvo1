@@ -10,7 +10,7 @@ class CAttacker
 public:
 	CAttacker(const char & type, const CGate & start, const int & number, const int & health, const bool & stunned); //NEW
 	CAttacker(const char & type, const int & ypos, const int & xpos, const int & number, const int & health, const bool & stunned); //LOAD
-	~CAttacker(){};
+	virtual ~CAttacker(){};
 	virtual bool Move() = 0;
 	bool AssignPath(const CGate & gate);
 	bool CheckWin();

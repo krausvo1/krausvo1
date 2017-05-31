@@ -18,6 +18,11 @@ CGame::CGame() : m_goal(0), m_maxheight(0), m_maxwidth(0){
 	srand(time(NULL));
 }
 
+CGame::~CGame(){
+	for(unsigned int i = 0; i < v_towers.size(); i++)
+          delete v_towers[i];
+}
+
 void CGame::SetExit(){
 	for(unsigned int i = 0; i < v_gates.size(); i++){
 		if(v_gates[i].m_gate_type == '<'){
@@ -155,33 +160,29 @@ void CGame::NewGame(){
 	v_gates.push_back(gate2);
 	v_gates.push_back(gate3);
 
-	v_borders.push_back(TBorder(4,25));
-	v_borders.push_back(TBorder(3,26));
-
-	v_borders.push_back(TBorder(4,46));
-
+	// v_borders.push_back(TBorder(4,25));
+	// v_borders.push_back(TBorder(3,26));
+	// v_borders.push_back(TBorder(4,46));
 
 
-
-
-	// int random = rozmezi(eng);
-	// for(int i = 1; i < m_maxwidth-6;i++){
-	// 	if(i == random){
-	// 		int dylka_zdi = rozmezi_vyska(eng);
-	// 		if(rozsudek(eng) % 2 == 0){
-	// 			for(int j = 1; j < dylka_zdi; j++){
-	// 				v_borders.push_back(TBorder(j, i));
-	// 			}
-	// 		}
-	// 		else
-	// 			for(int j = m_maxheight - 4; j > m_maxheight - 4 - dylka_zdi; j--)
-	// 				v_borders.push_back(TBorder(j, i));
+	int random = rozmezi(eng);
+	for(int i = 1; i < m_maxwidth-6;i++){
+		if(i == random){
+			int dylka_zdi = rozmezi_vyska(eng);
+			if(rozsudek(eng) % 2 == 0){
+				for(int j = 1; j < dylka_zdi; j++){
+					v_borders.push_back(TBorder(j, i));
+				}
+			}
+			else
+				for(int j = m_maxheight - 4; j > m_maxheight - 4 - dylka_zdi; j--)
+					v_borders.push_back(TBorder(j, i));
 
 			
 			
-	// 		random += rozmezi(eng);
-	// 	}
-	// }
+			random += rozmezi(eng);
+		}
+	}
 
 
 	SetExit();
@@ -196,50 +197,43 @@ void CGame::NewGame(){
 }
 
 bool CGame::LoadGame(ifstream & file){
-	char object, type;
-	int ypos, xpos;
-	int maxheightLoaded, maxwidthLoaded;
-	int health = 0, stunned = false;
-
 	getmaxyx(stdscr, m_maxheight, m_maxwidth);
 
-	file >> maxheightLoaded >> maxwidthLoaded >> m_goal;
-
-	if(m_maxheight < maxheightLoaded || m_maxwidth < maxwidthLoaded){
-		resizeterm(maxwidthLoaded, maxwidthLoaded);
-		clear();
-		printw("Widen the terminal window, please.");
+	int maxheightLoaded, maxwidthLoaded;
+	if(!(file >> maxheightLoaded >> maxwidthLoaded >> m_goal)){
+		printw("Header of the file is invalid, please check the first line.");
 		refresh();
 		usleep(2000000);
+		return false;
 	}
 
-	m_maxheight = maxheightLoaded;
-	m_maxwidth = maxwidthLoaded;
+	CheckResolution(maxheightLoaded, maxwidthLoaded);
+	CheckGoal();
 
-	if(m_goal > 19 || m_goal < 5){
-		clear();
-		printw("Goal out of interval <5,19>, setting it to 19.");
-		refresh();
-		usleep(2000000);
-		m_goal = 19;
-	}
-
-	int line = 1;
 	clear();
 
+	char object, type;
+	int ypos, xpos;
+	int health = 0, stunned = false;
+	int line_number = 1;
 	while(file >> object >> type >> ypos >> xpos){
-		if(object == 'A'){
-			file >> health >> stunned;
+		if(object == 'A' && !(file >> health >> stunned)){
+			line_number++;
+			break;
 		}
 
-		line++;
+		line_number++;
 
 		if(!CreateObject(object, type, ypos, xpos, health, stunned)){
-			printw("Error occured while reading data from the file, line: %d", line);
-			refresh();
-			usleep(1000000);
-			return false;
+			break;
 		}
+	}
+
+	if(!file.eof()){
+		printw("Error occured while reading data from the file, line: %d ", line_number);
+		refresh();
+		usleep(2400000);
+		return false;
 	}
 
 	printw("Game loaded!");
@@ -388,4 +382,27 @@ void CGame::SaveGame(const CMap & map){
 	for(unsigned int i = 0; i < map.v_borders.size(); i++){
 		outputFile << "B # " << map.v_borders[i].t_ypos << " " << map.v_borders[i].t_xpos << '\n';
 	}
+}
+
+void CGame::CheckGoal(){
+	if(m_goal > 19 || m_goal < 5){
+		clear();
+		printw("Goal out of interval <5,19>, setting it to 19.");
+		refresh();
+		usleep(2000000);
+		m_goal = 19;
+	}
+}
+
+void CGame::CheckResolution(const int & maxheightLoaded, const int & maxwidthLoaded){
+		if(m_maxheight < maxheightLoaded || m_maxwidth < maxwidthLoaded){
+		resizeterm(maxwidthLoaded, maxwidthLoaded);
+		clear();
+		printw("Widen the terminal window, please.");
+		refresh();
+		usleep(2000000);
+	}
+
+	m_maxheight = maxheightLoaded;
+	m_maxwidth = maxwidthLoaded;
 }

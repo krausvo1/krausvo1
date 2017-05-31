@@ -6,7 +6,7 @@ class CAdvancedAttacker : public CAttacker{
 public:
 	CAdvancedAttacker(const int & ypos, const int & xpos, const int & number, const int & health);
 	CAdvancedAttacker(const CGate & start, const int & number);
-	~CAdvancedAttacker(){};
+	virtual ~CAdvancedAttacker(){};
 
 	virtual void TakeHit(const int & damage, const bool & stun);
 	virtual bool Move();

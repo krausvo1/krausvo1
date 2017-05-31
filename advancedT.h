@@ -6,7 +6,7 @@
 class CAdvancedTower : public CTower{
 public:
 	CAdvancedTower(const int & ypos, const int & xpos);
-	~CAdvancedTower(){};
+	virtual ~CAdvancedTower(){};
 
 	virtual void ChargeStun();
 	virtual void Shoot(CAttacker & attacker);

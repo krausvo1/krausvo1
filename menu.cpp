@@ -75,7 +75,7 @@ bool CMenu::Load(){
 	echo();
 	curs_set(1);
 
-	char file_name[100];
+	char file_name[50];
 	getstr(file_name);
 
 	noecho();
