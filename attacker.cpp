@@ -2,9 +2,12 @@
 
 CAttacker::CAttacker(const char & type, const CGate & start, const int & number, const int & health, const bool & stunned):
 					m_attacker_type(type), m_ypos(start.m_ypos), m_xpos(start.m_xpos), //NEW
-					m_hit(false), m_health(health), m_number(number), m_start(start), m_moves(2), m_attacker_won(false), m_stunned(stunned){}
-	//m_health pryč!
-	///////
+					m_hit(false), m_health(health), m_number(number), m_start(start), m_moves(2), m_attacker_won(false), m_stunned(stunned)
+{
+	real_ypos = m_start.path[m_start.path.size() - (m_moves+1)].first;
+	real_xpos = m_start.path[m_start.path.size() - (m_moves+1)].second;
+}
+
 
 CAttacker::CAttacker(const char & type, const int & ypos, const int & xpos, const int & number, const int & health, const bool & stunned): //LOAD 
 					m_attacker_type(type), m_ypos(ypos), m_xpos(xpos), 
@@ -17,6 +20,8 @@ bool CAttacker::AssignPath(const CGate & gate){
 		if(std::make_pair(m_ypos,m_xpos)==gate.path[i]){
 			m_start = gate;
 			m_moves = m_start.path.size() - i;
+			real_ypos = m_start.path[m_start.path.size() - m_moves].first;
+			real_xpos = m_start.path[m_start.path.size() - m_moves].second;
 			return true;
 		}
 	}
@@ -32,6 +37,6 @@ bool CAttacker::CheckWin(){
 	return false;
 }
 
-bool CAttacker::IsAlive() const{
-	return m_health > 0;
+bool CAttacker::IsInGame() const{
+	return m_health > 0 && !m_attacker_won;
 }

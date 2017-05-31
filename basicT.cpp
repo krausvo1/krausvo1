@@ -10,7 +10,7 @@ bool CBasicTower::InRange(const CAttacker & attacker) const{
 	for(int j = - 1; j < m_range; j++)
 		for(int k = - 1; k < m_range; k++)
 			if((m_ypos + j == attacker.real_ypos) && (m_xpos + k == attacker.real_xpos) 
-				&& attacker.IsAlive() && ClearShot(attacker) && !attacker.m_attacker_won)
+				&& ClearShot(attacker))
 				return true;
 
 	return false;

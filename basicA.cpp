@@ -25,7 +25,7 @@ bool CBasicAttacker::Move(){
 		move(m_start.path[m_start.path.size() - m_moves].first,  m_start.path[m_start.path.size() - m_moves].second);
 		addch(m_attacker_type);
 		attroff(COLOR_PAIR(2));
-		return 1;
+		return true;
 	}
 
 	m_ypos = m_start.path[m_start.path.size() - m_moves].first;

@@ -22,34 +22,37 @@ struct TLog{
 
 class CMap{
 public:
-	CMap(const std::vector<CTower*> & twrs, const std::vector<CGate> & gts, const std::vector<TBorder> & brdrs, 
+	CMap(const std::vector<CTower*> & towers, const std::vector<CGate> & gates, const std::vector<TBorder> & borders, 
 		 const int & maxheight, const int & maxwidth, const CGate & exit);
 	
-	CMap(const std::vector<CTower*> & twrs, const std::vector<CGate> & gts,
-		 const std::vector<CAttacker*> & attcks, const std::vector<TBorder> & brdrs, const int & maxheight, const int & maxwidth,
+	CMap(const std::vector<CTower*> & towers, const std::vector<CGate> & gates,
+		 const std::vector<CAttacker*> & attackers, const std::vector<TBorder> & borders, const int & maxheight, const int & maxwidth,
 		 const CGate & exit);
 
-	~CMap(){}
+	~CMap();
+
+	std::vector<std::pair<int,int>> FindPath(CGate & start);
 
 	void NextFrame ();
 
-	void AddAttacker (const CGate & gate);
-
-	std::vector<std::pair<int,int>> FindPath(CGate & start);
+	void CheckCollisions();
 
 	void PrintBorders (const char & choice);
 	void PrintTowers();
 	void PrintGates();
 	void PrintAttackers();
+	
 	void PrintLogs();
 	void SwitchLogs();
 
+	void AddAttacker (const CGate & gate);
 
-	std::vector<CTower*> towers;
-	std::vector<CGate> gates;
-	std::vector<CAttacker*> attackers;
-	std::vector<TLog> logs;
-	std::vector<TBorder> borders;
+
+	std::vector<CTower*> v_towers;
+	std::vector<CGate> v_gates;
+	std::vector<CAttacker*> v_attackers;
+	std::vector<TLog> v_logs;
+	std::vector<TBorder> v_borders;
 
 	int m_attackers_alive;
 

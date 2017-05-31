@@ -26,13 +26,14 @@ bool CAdvancedTower::InRange(const CAttacker & attacker) const{
 	for(int j = - 1; j < m_range; j++)
 		for(int k = - 1; k < m_range; k++)
 			if((m_ypos + j == attacker.real_ypos) && (m_xpos + k == attacker.real_xpos) 
-				&& attacker.IsAlive() && ClearShot(attacker) && !attacker.m_attacker_won)
+				&& ClearShot(attacker))
 				return true;
 
-	if((m_ypos - 2 == attacker.real_ypos && m_xpos == attacker.real_xpos) ||
+	if(((m_ypos - 2 == attacker.real_ypos && m_xpos == attacker.real_xpos) ||
 	   (m_ypos + 2 == attacker.real_ypos && m_xpos == attacker.real_xpos) ||
 	   (m_ypos == attacker.real_ypos && m_xpos == attacker.real_xpos - 2) ||
-	   (m_ypos == attacker.real_ypos && m_xpos == attacker.real_xpos + 2) )
+	   (m_ypos == attacker.real_ypos && m_xpos == attacker.real_xpos + 2)) && 
+		ClearShot(attacker))
 	{
 		return true;
 	}

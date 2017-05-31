@@ -14,7 +14,7 @@ public:
 	virtual bool Move() = 0;
 	bool AssignPath(const CGate & gate);
 	bool CheckWin();
-	bool IsAlive() const;
+	bool IsInGame() const;
 	virtual void TakeHit(const int & damage, const bool & stun) = 0;
 
 	char m_attacker_type;

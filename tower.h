@@ -7,7 +7,7 @@
 class CTower{
 public:
 	CTower(const char & type, const int & ypos, const int & xpos);
-	~CTower(){};
+	virtual ~CTower(){};
 	virtual void Shoot(CAttacker & attacker) = 0;
 	virtual int ChooseTarget() const = 0;
 	virtual void ChargeStun(){}
@@ -20,7 +20,6 @@ public:
 	char m_tower_type;
 	int m_ypos, m_xpos;
 	int m_range;
-	// bool m_stun_ready; //ADVANCED
 
 	std::vector<CAttacker*> v_targets;
 	std::vector<TBorder> v_borders;

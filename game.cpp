@@ -106,15 +106,15 @@ void CGame::StartGame(CMap map){
 			case 'q':
 				return;
 			case '1':
-				map.AddAttacker(map.gates[0]);
+				map.AddAttacker(map.v_gates[0]);
 				continue;
 			case '2':
-				if(map.gates.size() > 2)
-					map.AddAttacker(map.gates[1]);
+				if(map.v_gates.size() > 2)
+					map.AddAttacker(map.v_gates[1]);
 				continue;
 			case '3':
-				if(map.gates.size() > 3)
-					map.AddAttacker(map.gates[2]);
+				if(map.v_gates.size() > 3)
+					map.AddAttacker(map.v_gates[2]);
 				continue;
 			case 'S':
 			case 's':
@@ -228,11 +228,11 @@ bool CGame::LoadGame(ifstream & file){
 	clear();
 
 	while(file >> object >> type >> ypos >> xpos){
-		line++;
 		if(object == 'A'){
 			file >> health >> stunned;
-			line++;
 		}
+
+		line++;
 
 		if(!CreateObject(object, type, ypos, xpos, health, stunned)){
 			printw("Error occured while reading data from the file, line: %d", line);
@@ -377,15 +377,15 @@ void CGame::SaveGame(const CMap & map){
 		outputFile << "T " << v_towers[i]->m_tower_type << " " << v_towers[i]->m_ypos << " " << v_towers[i]->m_xpos << '\n';
 	}
 
-	for(unsigned int i = 0; i < map.attackers.size(); i++){
-		if(map.attackers[i]->m_attacker_type == 'X')
+	for(unsigned int i = 0; i < map.v_attackers.size(); i++){
+		if(map.v_attackers[i]->m_attacker_type == 'X')
 			continue;
 
-		outputFile << "A " << map.attackers[i]->m_attacker_type << " " << map.attackers[i]->m_ypos << " " << map.attackers[i]->m_xpos << '\n';
-		outputFile << map.attackers[i]->m_health << " " << map.attackers[i]->m_stunned << '\n';
+		outputFile << "A " << map.v_attackers[i]->m_attacker_type << " " << map.v_attackers[i]->m_ypos << " " << map.v_attackers[i]->m_xpos << '\n';
+		outputFile << map.v_attackers[i]->m_health << " " << map.v_attackers[i]->m_stunned << '\n';
 	}
 
-	for(unsigned int i = 0; i < map.borders.size(); i++){
-		outputFile << "B # " << map.borders[i].t_ypos << " " << map.borders[i].t_xpos << '\n';
+	for(unsigned int i = 0; i < map.v_borders.size(); i++){
+		outputFile << "B # " << map.v_borders[i].t_ypos << " " << map.v_borders[i].t_xpos << '\n';
 	}
 }

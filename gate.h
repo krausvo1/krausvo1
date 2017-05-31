@@ -7,7 +7,7 @@ class CGate{
 public:
 	CGate(const char & gate_type, const int & ypos, const int & xpos, const int & gate_ID);
 	CGate(){};
-	~CGate(){};
+	~CGate();
 
 	CGate & operator= (const CGate & src);
 
