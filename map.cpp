@@ -7,10 +7,11 @@
 
 using namespace std;
 
-CMap::CMap(const std::vector<CTower*> & towers, const std::vector<CGate> & gates, const std::vector<TBorder> & borders, const int & maxheight, const int & maxwidth,
+CMap::CMap(const std::vector<CTower*> & towers, const std::vector<CGate> & gates, 
+		   const std::vector<TBorder> & borders, const int & maxheight, const int & maxwidth, 
 		   const CGate & exit):
-		   v_towers(towers), v_gates(gates), v_borders(borders), m_attackers_alive(0), m_maxheight(maxheight), m_maxwidth(maxwidth), 
-		   m_exit_gate(exit), m_attackers_won(0), m_logs_on(true)
+		   v_towers(towers), v_gates(gates), v_borders(borders), m_attackers_alive(0), m_first_not_loaded(0), 
+		   m_maxheight(maxheight), m_maxwidth(maxwidth), m_exit_gate(exit), m_attackers_won(0), m_logs_on(true)
 {
 	map.resize(m_maxheight);
 	for(int i = 0; i < m_maxheight; i++){
@@ -37,8 +38,9 @@ CMap::CMap(const std::vector<CTower*> & towers, const std::vector<CGate> & gates
 CMap::CMap(const std::vector<CTower*> & towers, const std::vector<CGate> & gates,
 		   const std::vector<CAttacker*> & attackers, const std::vector<TBorder> & borders, 
 		   const int & maxheight, const int & maxwidth, const CGate & exit):
-		   v_towers(towers), v_gates(gates), v_attackers(attackers), v_borders(borders), m_attackers_alive(0),
-		   m_maxheight(maxheight), m_maxwidth(maxwidth), m_exit_gate(exit), m_attackers_won(0), m_logs_on(true)
+		   v_towers(towers), v_gates(gates), v_attackers(attackers), v_borders(borders), m_attackers_alive(0), 
+		   m_first_not_loaded(attackers.size()), m_maxheight(maxheight), m_maxwidth(maxwidth), m_exit_gate(exit), 
+		   m_attackers_won(0), m_logs_on(true)
 {
 	map.resize(m_maxheight);
 	for(int i = 0; i < m_maxheight; i++){
@@ -68,10 +70,8 @@ CMap::CMap(const std::vector<CTower*> & towers, const std::vector<CGate> & gates
 }
 
 CMap::~CMap(){
-    for(unsigned int i = 0; i < v_attackers.size(); i++)
-          delete v_attackers[i];
-
-    v_attackers.clear();
+	for(unsigned int i = m_first_not_loaded; i < v_attackers.size(); i++)
+          delete v_attackers[i];  
 }
 
 vector<pair<int,int> > CMap::FindPath(CGate & start){
@@ -90,40 +90,36 @@ vector<pair<int,int> > CMap::FindPath(CGate & start){
 	//očísluj
 	while(temp[0].first != m_exit_gate.m_ypos || temp[0].second != m_exit_gate.m_xpos){ 
 
-		if(y!=0)
 		if(y != 0 && map[y - 1][x] == 0){//y != 0 kvůli pozici -1
-			temp.push_back(make_pair(y-1,x));
-			map[y-1][x] = map[y][x] + 1;
+			temp.push_back(make_pair(y - 1, x));
+			map[y - 1][x] = map[y][x] + 1;
 			// move(y-1,x);
 			// addch(map[y-1][x]);
 			// refresh();
 			// usleep(19000);
 		}
 		
-		if(x!=0)
 		if(x != 0 && map[y][x - 1] == 0){//x != 0 kvůli pozici -1
-			temp.push_back(make_pair(y,x-1));
-			map[y][x-1] = map[y][x] + 1;
+			temp.push_back(make_pair(y, x - 1));
+			map[y][x - 1] = map[y][x] + 1;
 			// move(y,x-1);
 			// addch(map[y][x-1]);
 			// refresh();
 			// usleep(19000);
 		}
 
-		if(y!=m_maxheight-4)
-		if(map[y + 1][x] == 0){
-			temp.push_back(make_pair(y+1,x));
-			map[y+1][x] = map[y][x] + 1;
+		if(y != m_maxheight - 4 && map[y + 1][x] == 0){
+			temp.push_back(make_pair(y + 1, x));
+			map[y + 1][x] = map[y][x] + 1;
 			// move(y+1,x);
 			// addch(map[y+1][x]);
 			// refresh();
 			// usleep(19000);
 		}
 
-		if(x!=m_maxwidth-1)		
-		if(map[y][x+1] == 0){
-			temp.push_back(make_pair(y,x+1));
-			map[y][x+1] = map[y][x] + 1;
+		if(x != m_maxwidth - 1 && map[y][x + 1] == 0){
+			temp.push_back(make_pair(y, x + 1));
+			map[y][x + 1] = map[y][x] + 1;
 			// move(y,x+1);
 			// addch(map[y][x+1]);
 			// refresh();
@@ -146,7 +142,7 @@ vector<pair<int,int> > CMap::FindPath(CGate & start){
 	y = m_exit_gate.m_ypos;
 	x = m_exit_gate.m_xpos;
 	
-	path.push_back(make_pair(y,x));
+	path.push_back(make_pair(y, x));
 	clear();
 	// printw("POnd pos: %d,%d", y,x);
 	// refresh();
@@ -163,22 +159,21 @@ vector<pair<int,int> > CMap::FindPath(CGate & start){
 	// usleep(1900000);
 	// clear();
 	// refresh();
-	while(!(path[path.size()-1].first == start.m_ypos && path[path.size()-1].second == start.m_xpos)){ 
-		if(path.size()>1){
+	while(!(path[path.size() - 1].first == start.m_ypos && path[path.size() - 1].second == start.m_xpos)){ 
+		if(path.size() > 1){
 			i++;
 			// y = path[path.size() - 1].first;
 			// x = path[path.size() - 1].second;
-			y = path[path.size()-1].first;
-			x = path[path.size()-1].second;
+			y = path[path.size() - 1].first;
+			x = path[path.size() - 1].second;
 			// mvprintw(0,0,"%d,%d",y,x);
 			// refresh();
 			// usleep(10000);
 
 		}
 
-		if(y!=0)
-		if(map[y - 1][x] == map[y][x] - 1){
-			path.push_back(make_pair(y-1,x));
+		if(y != 0 && map[y - 1][x] == map[y][x] - 1){
+			path.push_back(make_pair(y - 1, x));
 			// move(y-1,x);
 			// addch(map[y-1][x]);
 			// refresh();
@@ -186,9 +181,8 @@ vector<pair<int,int> > CMap::FindPath(CGate & start){
 			continue;
 		}
 
-		if(x!=0)
-		if(map[y][x - 1] == map[y][x] - 1){
-			path.push_back(make_pair(y,x-1));
+		if(x != 0 && map[y][x - 1] == map[y][x] - 1){
+			path.push_back(make_pair(y, x - 1));
 			// move(y,x-1);
 			// addch(map[y][x-1]);
 			// refresh();
@@ -196,9 +190,8 @@ vector<pair<int,int> > CMap::FindPath(CGate & start){
 			continue;
 		}
 
-		if(y!=m_maxheight-4)
-		if(map[y + 1][x] == map[y][x] - 1){
-			path.push_back(make_pair(y+1,x));
+		if(y != m_maxheight - 4 && map[y + 1][x] == map[y][x] - 1){
+			path.push_back(make_pair(y + 1, x));
 			// move(y+1,x);
 			// addch(map[y+1][x]);
 			// refresh();
@@ -206,9 +199,8 @@ vector<pair<int,int> > CMap::FindPath(CGate & start){
 			continue;
 		}
 		
-		if(x!=m_maxwidth-1)		
-		if(map[y][x+1] == map[y][x] - 1){
-			path.push_back(make_pair(y,x+1));
+		if(x != m_maxwidth - 1 && map[y][x + 1] == map[y][x] - 1){
+			path.push_back(make_pair(y, x + 1));
 			// move(y,x+1);
 			// addch(map[y][x+1]);
 			// refresh();
@@ -331,7 +323,6 @@ void CMap::AddAttacker (const CGate & start){
 	refresh();
 
 	nodelay(stdscr, false);
-	// char attacker_type = getch();
 
 	switch(getch()){
 		case 'B':

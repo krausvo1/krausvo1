@@ -1,6 +1,9 @@
 #include "gate.h"
 #include <curses.h>
+#include <iostream>
 #include <unistd.h>
+
+using namespace std;
 
 #ifndef ATTACKER_H
 #define ATTACKER_H
@@ -8,8 +11,8 @@
 class CAttacker
 {
 public:
-	CAttacker(const char & type, const CGate & start, const int & number, const int & health, const bool & stunned); //NEW
-	CAttacker(const char & type, const int & ypos, const int & xpos, const int & number, const int & health, const bool & stunned); //LOAD
+	CAttacker(const char & type, const CGate & start, const int & number, const int & health); //NEW
+	CAttacker(const char & type, const int & ypos, const int & xpos, const int & number, const int & health); //LOAD
 	virtual ~CAttacker(){};
 	virtual bool Move() = 0;
 	bool AssignPath(const CGate & gate);
@@ -36,7 +39,6 @@ public:
 	bool m_attacker_won;
 
 	bool m_stunned;
-
 };
 
 #endif

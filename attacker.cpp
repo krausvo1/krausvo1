@@ -1,23 +1,23 @@
 #include "attacker.h"
 
-CAttacker::CAttacker(const char & type, const CGate & start, const int & number, const int & health, const bool & stunned):
+CAttacker::CAttacker(const char & type, const CGate & start, const int & number, const int & health):
 					m_attacker_type(type), m_ypos(start.m_ypos), m_xpos(start.m_xpos), //NEW
-					m_hit(false), m_health(health), m_number(number), m_start(start), m_moves(2), m_attacker_won(false), m_stunned(stunned)
+					m_hit(false), m_health(health), m_number(number), m_start(start), m_moves(2), m_attacker_won(false)
 {
 	real_ypos = m_start.path[m_start.path.size() - (m_moves+1)].first;
 	real_xpos = m_start.path[m_start.path.size() - (m_moves+1)].second;
 }
 
 
-CAttacker::CAttacker(const char & type, const int & ypos, const int & xpos, const int & number, const int & health, const bool & stunned): //LOAD 
+CAttacker::CAttacker(const char & type, const int & ypos, const int & xpos, const int & number, const int & health): //LOAD 
 					m_attacker_type(type), m_ypos(ypos), m_xpos(xpos), 
 					m_hit(false), m_health(health), m_number(number), m_start(CGate()),
-					m_moves(0), m_attacker_won(false), m_stunned(stunned){}
+					m_moves(0), m_attacker_won(false){}
 
 
 bool CAttacker::AssignPath(const CGate & gate){
 	for(unsigned int i = 0; i < gate.path.size(); i++){
-		if(std::make_pair(m_ypos,m_xpos)==gate.path[i]){
+		if(std::make_pair(m_ypos,m_xpos) == gate.path[i]){
 			m_start = gate;
 			m_moves = m_start.path.size() - i;
 			real_ypos = m_start.path[m_start.path.size() - m_moves].first;

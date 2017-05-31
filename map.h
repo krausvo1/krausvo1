@@ -33,7 +33,7 @@ public:
 
 	std::vector<std::pair<int,int>> FindPath(CGate & start);
 
-	void NextFrame ();
+	void NextFrame();
 
 	void CheckCollisions();
 
@@ -55,6 +55,7 @@ public:
 	std::vector<TBorder> v_borders;
 
 	int m_attackers_alive;
+	int m_first_not_loaded;
 
 	const int m_maxheight;
 	const int m_maxwidth;

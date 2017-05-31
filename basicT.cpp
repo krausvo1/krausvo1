@@ -1,6 +1,7 @@
 #include "basicT.h"
 
-CBasicTower::CBasicTower(const int & ypos, const int & xpos):CTower('T', ypos, xpos){}
+CBasicTower::CBasicTower(const int & ypos, const int & xpos):
+						 CTower('T', ypos, xpos){}
 
 void CBasicTower::Shoot(CAttacker & attacker){
 	attacker.TakeHit(20, false);
@@ -29,20 +30,20 @@ int CBasicTower::ChooseTarget() const{
 }
 
 void CBasicTower::CheckRange(){
-	bool top = false, left = false, right = false, bottom = false;
+	bool top = false, bottom = false, left = false, right = false;
 
 	for(unsigned int i = 0; i < v_borders.size(); i++){
 		if(v_borders[i].t_ypos == m_ypos - 1 && v_borders[i].t_xpos == m_xpos)
 			top = true;
+
+		if(v_borders[i].t_ypos == m_ypos + 1 && v_borders[i].t_xpos == m_xpos)
+			bottom = true;
 		
 		if(v_borders[i].t_ypos == m_ypos && v_borders[i].t_xpos == m_xpos - 1)
 			left = true;
 		
 		if(v_borders[i].t_ypos == m_ypos && v_borders[i].t_xpos == m_xpos + 1)
 			right = true;
-		
-		if(v_borders[i].t_ypos == m_ypos + 1 && v_borders[i].t_xpos == m_xpos)
-			bottom = true;
 	}
 
 	if(top && left)
@@ -57,10 +58,3 @@ void CBasicTower::CheckRange(){
 	if(bottom && right)
 		v_blind_spots.push_back(std::make_pair(m_ypos + 1, m_xpos + 1));
 }
-
-// bool CBasicTower::InRange(const CAttacker & attacker){
-// 	for(int j = - 1; j < m_range; j++)
-// 		for(int k = - 1; k < m_range; k++)
-// 			if((m_ypos + j == attacker.m_ypos) && (m_xpos + k == attacker.m_xpos) && attacker.IsAlive())
-// 				v_targets.pushback(attacker);
-// }

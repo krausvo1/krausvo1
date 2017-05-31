@@ -1,11 +1,11 @@
 #include "basicA.h"
 
 CBasicAttacker::CBasicAttacker(const int & ypos, const int & xpos, const int & number, const int & health, const bool & stunned):
-							   CAttacker('&', ypos, xpos, number, health, stunned){} //LOAD
+							   CAttacker('&', ypos, xpos, number, health), m_stunned(stunned){} //LOAD
 
 
 CBasicAttacker::CBasicAttacker(const CGate & start, const int & number):
-							   CAttacker('&', start, number, 150, false){} //NEW
+							   CAttacker('&', start, number, 150), m_stunned(false){} //NEW
 
 
 void CBasicAttacker::TakeHit(const int & damage, const bool & stun){
@@ -13,7 +13,6 @@ void CBasicAttacker::TakeHit(const int & damage, const bool & stun){
 	m_health -= damage;
 	m_stunned = stun;
 }
-
 
 bool CBasicAttacker::Move(){
 	if(!(m_health > 0))

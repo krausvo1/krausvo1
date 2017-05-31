@@ -1,11 +1,11 @@
 #include "advancedA.h"
 
 CAdvancedAttacker::CAdvancedAttacker(const int & ypos, const int & xpos, const int & number, const int & health):
-							   CAttacker('@', ypos, xpos, number, health, false){} //LOAD
+							   CAttacker('@', ypos, xpos, number, health), m_stunned(false){} //LOAD
 
 
 CAdvancedAttacker::CAdvancedAttacker(const CGate & start, const int & number):
-							   CAttacker('@', start, number, 200, false){} //NEW
+							   CAttacker('@', start, number, 200), m_stunned(false){} //NEW
 
 
 void CAdvancedAttacker::TakeHit(const int & damage, const bool & stun){

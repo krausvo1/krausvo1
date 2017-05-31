@@ -3,7 +3,7 @@
 #include <cmath>
 
 CAdvancedTower::CAdvancedTower(const int & ypos, const int & xpos):
-								CTower('I', ypos, xpos), m_stun_ready(true){}
+					    	   CTower('I', ypos, xpos), m_stun_ready(true){}
 
 void CAdvancedTower::Shoot(CAttacker & attacker){
 	if(std::abs(attacker.real_ypos - m_ypos) == 2 || std::abs(attacker.real_xpos - m_xpos) == 2)
@@ -29,25 +29,26 @@ bool CAdvancedTower::InRange(const CAttacker & attacker) const{
 				&& ClearShot(attacker))
 				return true;
 
-	if(((m_ypos - 2 == attacker.real_ypos && m_xpos == attacker.real_xpos) ||
-	   (m_ypos + 2 == attacker.real_ypos && m_xpos == attacker.real_xpos) ||
-	   (m_ypos == attacker.real_ypos && m_xpos == attacker.real_xpos - 2) ||
-	   (m_ypos == attacker.real_ypos && m_xpos == attacker.real_xpos + 2)) && 
+	if(((std::abs(attacker.real_ypos - m_ypos) == 2 && m_xpos == attacker.real_xpos) ||
+	   (std::abs(attacker.real_xpos - m_xpos) == 2 && m_ypos == attacker.real_ypos)) &&
 		ClearShot(attacker))
-	{
 		return true;
-	}
 
 	return false;
 }
 
 void CAdvancedTower::CheckRange(){
-	bool top = false, left = false, right = false, bottom = false;
+	bool top = false, bottom = false, left = false, right = false;
 
 	for(unsigned int i = 0; i < v_borders.size(); i++){
 		if(v_borders[i].t_ypos == m_ypos - 1 && v_borders[i].t_xpos == m_xpos){
 			v_blind_spots.push_back(std::make_pair(m_ypos - 2, m_xpos));
 			top = true;
+		}
+
+		if(v_borders[i].t_ypos == m_ypos + 1 && v_borders[i].t_xpos == m_xpos){
+			v_blind_spots.push_back(std::make_pair(m_ypos + 2, m_xpos));
+			bottom = true;
 		}
 		
 		if(v_borders[i].t_ypos == m_ypos && v_borders[i].t_xpos == m_xpos - 1){
@@ -58,11 +59,6 @@ void CAdvancedTower::CheckRange(){
 		if(v_borders[i].t_ypos == m_ypos && v_borders[i].t_xpos == m_xpos + 1){
 			v_blind_spots.push_back(std::make_pair(m_ypos, m_xpos + 2));
 			right = true;
-		}
-		
-		if(v_borders[i].t_ypos == m_ypos + 1 && v_borders[i].t_xpos == m_xpos){
-			v_blind_spots.push_back(std::make_pair(m_ypos + 2, m_xpos));
-			bottom = true;
 		}
 	}
 

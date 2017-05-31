@@ -21,6 +21,9 @@ CGame::CGame() : m_goal(0), m_maxheight(0), m_maxwidth(0){
 CGame::~CGame(){
 	for(unsigned int i = 0; i < v_towers.size(); i++)
           delete v_towers[i];
+
+   for(unsigned int i = 0; i < v_attackers.size(); i++)
+      delete v_attackers[i];
 }
 
 void CGame::SetExit(){
@@ -129,7 +132,6 @@ void CGame::StartGame(CMap map){
 	}	
 }
 
-
 void CGame::NewGame(){
 	clear();
 	v_towers.clear();
@@ -140,25 +142,47 @@ void CGame::NewGame(){
 	getmaxyx(stdscr, m_maxheight, m_maxwidth);
 	std::random_device rd;
 	std::mt19937 eng(rd());
-	std::uniform_int_distribution<int> rozmezi_vyska(m_maxheight - 10,m_maxheight - 6);
+	std::uniform_int_distribution<int> rozmezi_vyska(m_maxheight - 20,m_maxheight - 13);
+	std::uniform_int_distribution<int> vyska(1, m_maxheight - 3);
 	std::uniform_int_distribution<int> rozmezi_sirka(1, m_maxwidth-4);
 	std::uniform_int_distribution<int> rozmezi(6, 13);
 	std::uniform_int_distribution<int> rozsudek(1, 10);
+	std::uniform_int_distribution<int> pocet_bran(2, 3);
 
-	
-	CGate gate1 ('1', 4, m_maxwidth-2, 1);
-	CGate gate2 ('2', 8, m_maxwidth-2, 2);
-	CGate gate3 ('<', 4, 1, 3);
+	//GATES
+	if(pocet_bran(eng) == 2){
+		std::uniform_int_distribution<int> prvni_pulka(1, (m_maxheight - 3) / 2);
+		std::uniform_int_distribution<int> druha_pulka((m_maxheight - 3) / 2, m_maxheight - 3);
+
+		CGate gate1 ('1', prvni_pulka(eng), m_maxwidth - 2, 1);
+		CGate gate2 ('2', druha_pulka(eng), m_maxwidth - 2, 2);
+		CGate gate3 ('<', vyska(eng), 1, 3);
+
+		v_gates.push_back(gate1);
+		v_gates.push_back(gate2);
+		v_gates.push_back(gate3);
+	}
+	else{
+		std::uniform_int_distribution<int> prvni_tretina(1, (m_maxheight - 3) / 3);
+		std::uniform_int_distribution<int> druha_tretina((m_maxheight - 3) / 3, (m_maxheight - 3) * 2/3);
+		std::uniform_int_distribution<int> treti_tretina((m_maxheight - 3) * 2/3, m_maxheight - 3);
+
+		CGate gate1 ('1', prvni_tretina(eng), m_maxwidth - 2, 1);
+		CGate gate2 ('2', druha_tretina(eng), m_maxwidth - 2, 2);
+		CGate gate3 ('3', treti_tretina(eng), m_maxwidth - 2, 3);
+		CGate gate4 ('<', vyska(eng), 1, 3);
+
+		v_gates.push_back(gate1);
+		v_gates.push_back(gate2);
+		v_gates.push_back(gate3);
+		v_gates.push_back(gate4);
+	}
 
 	v_towers.push_back(new CAdvancedTower (8, 50));
 	v_towers.push_back(new CAdvancedTower (4, 45));
 	v_towers.push_back(new CBasicTower (3, 25));
 	v_towers.push_back(new CAdvancedTower (m_maxheight-4, 8));
 	v_towers.push_back(new CBasicTower (m_maxheight-4, 7));
-
-	v_gates.push_back(gate1);
-	v_gates.push_back(gate2);
-	v_gates.push_back(gate3);
 
 	// v_borders.push_back(TBorder(4,25));
 	// v_borders.push_back(TBorder(3,26));
@@ -170,7 +194,7 @@ void CGame::NewGame(){
 		if(i == random){
 			int dylka_zdi = rozmezi_vyska(eng);
 			if(rozsudek(eng) % 2 == 0){
-				for(int j = 1; j < dylka_zdi; j++){
+				for(int j = 0; j < dylka_zdi; j++){
 					v_borders.push_back(TBorder(j, i));
 				}
 			}
@@ -180,7 +204,7 @@ void CGame::NewGame(){
 
 			
 			
-			random += rozmezi(eng);
+			random += 1 + rozmezi(eng);
 		}
 	}
 
@@ -251,8 +275,6 @@ bool CGame::LoadGame(ifstream & file){
 
 	return true;
 }
-
-
 
 bool CGame::CreateObject(const char & object,    const char & type, 
 						 const int & ypos, 	     const int & xpos, 
@@ -333,7 +355,6 @@ bool CGame::CreateBorder(const char & type, const int & ypos, const int & xpos){
 	return true;
 }
 
-
 void CGame::SaveGame(const CMap & map){
 	time_t t = time(0);
 	struct tm * now = localtime(&t);
@@ -377,6 +398,7 @@ void CGame::SaveGame(const CMap & map){
 
 		outputFile << "A " << map.v_attackers[i]->m_attacker_type << " " << map.v_attackers[i]->m_ypos << " " << map.v_attackers[i]->m_xpos << '\n';
 		outputFile << map.v_attackers[i]->m_health << " " << map.v_attackers[i]->m_stunned << '\n';
+
 	}
 
 	for(unsigned int i = 0; i < map.v_borders.size(); i++){
