@@ -4,8 +4,8 @@ CAttacker::CAttacker(const char & type, const CGate & start, const int & number,
 					m_attacker_type(type), m_ypos(start.m_ypos), m_xpos(start.m_xpos), //NEW
 					m_hit(false), m_health(health), m_number(number), m_start(start), m_moves(2), m_attacker_won(false)
 {
-	real_ypos = m_start.path[m_start.path.size() - (m_moves+1)].first;
-	real_xpos = m_start.path[m_start.path.size() - (m_moves+1)].second;
+	real_ypos = m_start.path[m_start.path.size() - (m_moves)].first;
+	real_xpos = m_start.path[m_start.path.size() - (m_moves)].second;
 }
 
 

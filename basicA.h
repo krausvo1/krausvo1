@@ -10,9 +10,11 @@ public:
 
 	virtual void TakeHit(const int & damage, const bool & stun);
 	virtual bool Move();
+	virtual void SetIsEscorted(const bool & escorted);
 
 private:
 	bool m_stunned;
+	bool m_is_escorted;
 };
 
 #endif

@@ -8,7 +8,10 @@ public:
 	CGate(const char & gate_type, const int & ypos, const int & xpos, const int & gate_ID);
 	CGate(){};
 	~CGate();
-	
+
+	std::vector<std::pair<int,int>> FindPath(const CGate & exit);
+	void ClearMap();
+
 
 	CGate & operator= (const CGate & src);
 

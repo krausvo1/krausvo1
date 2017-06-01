@@ -26,6 +26,8 @@ CGate & CGate::operator= (const CGate & src){
 
 
 
+
+
 // CGate::CGate(const int & gate_type, const int & ypos, const int & xpos):
 // 		   m_gate_type(gate_type),m_xpos(xpos),m_ypos(ypos){}		   
 

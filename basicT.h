@@ -11,7 +11,7 @@ public:
 
 	virtual void Shoot(CAttacker & attacker);
 	virtual int ChooseTarget() const;
-	virtual bool InRange(const CAttacker & attacker) const;
+	virtual bool InRange(const CAttacker & attacker);
 	virtual void CheckRange();
 
 

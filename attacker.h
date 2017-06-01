@@ -19,6 +19,7 @@ public:
 	bool CheckWin();
 	bool IsInGame() const;
 	virtual void TakeHit(const int & damage, const bool & stun) = 0;
+	virtual void SetIsEscorted(const bool & escorted){}
 
 	char m_attacker_type;
 

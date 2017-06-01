@@ -5,7 +5,7 @@ CAdvancedAttacker::CAdvancedAttacker(const int & ypos, const int & xpos, const i
 
 
 CAdvancedAttacker::CAdvancedAttacker(const CGate & start, const int & number):
-							   CAttacker('@', start, number, 200), m_stunned(false){} //NEW
+							   CAttacker('@', start, number,  200), m_stunned(false){} //NEW
 
 
 void CAdvancedAttacker::TakeHit(const int & damage, const bool & stun){

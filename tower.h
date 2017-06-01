@@ -11,7 +11,7 @@ public:
 	virtual void Shoot(CAttacker & attacker) = 0;
 	virtual int ChooseTarget() const = 0;
 	virtual void ChargeStun(){}
-	virtual bool InRange(const CAttacker & attacker) const = 0;
+	virtual bool InRange(const CAttacker & attacker) = 0;
 	bool ClearShot(const CAttacker & attacker) const;
 	virtual void CheckRange() = 0;
 

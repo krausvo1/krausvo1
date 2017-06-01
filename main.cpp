@@ -1,5 +1,4 @@
 #include <curses.h>
-#include <vector>
 #include "map.h"
 #include "menu.h"
 #include "attacker.h"

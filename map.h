@@ -37,9 +37,11 @@ public:
 
 	void CheckCollisions();
 
-	void PrintBorders (const char & choice);
-	void PrintTowers();
-	void PrintGates();
+	void CheckEscorts(CAttacker & attacker);
+
+	void PrintBorders() const;
+	void PrintTowers() const;
+	void PrintGates() const;
 	void PrintAttackers();
 	
 	void PrintLogs();
