@@ -36,6 +36,20 @@ public:
 	bool CheckVictory(const int & attackers_won);
 	void AssignBorders();
 
+	void ClearMap();
+
+	vector<pair<int,int> > FindPath(CGate & start);
+
+	void GenerateMap();
+
+	void GenerateWall(const int & dylka_zdi, const int & start_y, const std::pair<int,int> & position);
+
+	void GenerateBasicTower(int & placement, const std::pair<int,int> & position);
+
+	void GenerateAdvancedTower(int & placement, const std::pair<int,int> & position);
+
+	void InsertObstacle(const std::pair<int,int> & position);
+
 
 	bool CreateObject				(const char & object,   const char & type, 
 					 				 const int & ypos,      const int & xpos,
@@ -57,6 +71,8 @@ private:
 	std::vector<TBorder> v_borders;
 
 	CGate m_exit_gate;
+
+	std::vector<std::vector<int>> m_map;
 
 	int m_goal;
 
