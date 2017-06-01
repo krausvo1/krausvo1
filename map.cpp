@@ -13,26 +13,26 @@ CMap::CMap(const std::vector<CTower*> & towers, const std::vector<CGate> & gates
 		   v_towers(towers), v_gates(gates), v_borders(borders), m_attackers_alive(0), m_first_not_loaded(0), 
 		   m_maxheight(maxheight), m_maxwidth(maxwidth), m_exit_gate(exit), m_attackers_won(0), m_logs_on(true)
 {
-	map.resize(m_maxheight);
-	for(int i = 0; i < m_maxheight; i++){
-		map[i].resize(m_maxwidth);
-	}
+// 	map.resize(m_maxheight);
+// 	for(int i = 0; i < m_maxheight; i++){
+// 		map[i].resize(m_maxwidth);
+// 	}
 
-	for(unsigned int i = 0; i < v_gates.size(); i++){
-		for(int i = 0; i < m_maxheight; i++)
-			for(int j = 0; j < m_maxwidth; j++)
-				map[i][j] = 0;
+// 	for(unsigned int i = 0; i < v_gates.size(); i++){
+// 		for(int i = 0; i < m_maxheight; i++)
+// 			for(int j = 0; j < m_maxwidth; j++)
+// 				map[i][j] = 0;
 
-		for(unsigned int i = 0; i < v_towers.size(); i++){
-			map[v_towers[i]->m_ypos][v_towers[i]->m_xpos] = -8;
-		}
+// 		for(unsigned int i = 0; i < v_towers.size(); i++){
+// 			map[v_towers[i]->m_ypos][v_towers[i]->m_xpos] = -8;
+// 		}
 
-		PrintBorders('m');
+// 		PrintBorders('m');
 
-		if(v_gates[i].m_gate_type != '<'){
-			v_gates[i].path = FindPath(v_gates[i]);
-		}
-	}
+// 		if(v_gates[i].m_gate_type != '<'){
+// 			v_gates[i].path = FindPath(v_gates[i]);
+// 		}
+// 	}
 }
 
 CMap::CMap(const std::vector<CTower*> & towers, const std::vector<CGate> & gates,
@@ -42,31 +42,32 @@ CMap::CMap(const std::vector<CTower*> & towers, const std::vector<CGate> & gates
 		   m_first_not_loaded(attackers.size()), m_maxheight(maxheight), m_maxwidth(maxwidth), m_exit_gate(exit), 
 		   m_attackers_won(0), m_logs_on(true)
 {
-	map.resize(m_maxheight);
-	for(int i = 0; i < m_maxheight; i++){
-		map[i].resize(m_maxwidth);
-	}
+	// map.resize(m_maxheight);
+	// for(int i = 0; i < m_maxheight; i++){
+	// 	map[i].resize(m_maxwidth);
+	// }
 
+	// for(unsigned int i = 0; i < v_gates.size(); i++){
+	// 	for(int i = 0; i < m_maxheight; i++)
+	// 		for(int j = 0; j < m_maxwidth; j++)
+	// 			map[i][j] = 0;
+
+	// 	for(unsigned int i = 0; i < v_towers.size(); i++){
+	// 		map[v_towers[i]->m_ypos][v_towers[i]->m_xpos] = -8;
+	// 	}
+
+	// 	PrintBorders('m');
+
+	// 	if(v_gates[i].m_gate_type != '<'){
+	// 		v_gates[i].path = FindPath(v_gates[i]);
+	// 	}
 	for(unsigned int i = 0; i < v_gates.size(); i++){
-		for(int i = 0; i < m_maxheight; i++)
-			for(int j = 0; j < m_maxwidth; j++)
-				map[i][j] = 0;
-
-		for(unsigned int i = 0; i < v_towers.size(); i++){
-			map[v_towers[i]->m_ypos][v_towers[i]->m_xpos] = -8;
-		}
-
-		PrintBorders('m');
-
-		if(v_gates[i].m_gate_type != '<'){
-			v_gates[i].path = FindPath(v_gates[i]);
-		}
-
 		for(unsigned int j = 0; j < v_attackers.size(); j++){
-			if(v_attackers[j]->m_start.path.empty())
+			if(v_attackers[j]->m_start.path.empty() && v_gates[i].m_gate_type != '<')
 				v_attackers[j]->AssignPath(v_gates[i]);
 		}
-	}	
+	}
+	
 }
 
 CMap::~CMap(){
@@ -74,143 +75,143 @@ CMap::~CMap(){
           delete v_attackers[i];  
 }
 
-vector<pair<int,int> > CMap::FindPath(CGate & start){
-	std::vector<pair<int, int> > temp; //uchovává souřadnice
+// vector<pair<int,int> > CMap::FindPath(CGate & start){
+// 	std::vector<pair<int, int> > temp; //uchovává souřadnice
 
-	int y = start.m_ypos;
-	int x = start.m_xpos;
+// 	int y = start.m_ypos;
+// 	int x = start.m_xpos;
 
-	temp.push_back(make_pair(y,x));
-	clear();
-	// printw("start pos: %d,%d", y,x);
-	// printw("\nend pos: %d,%d", m_exit_gate.m_ypos,m_exit_gate.m_xpos);
-	// refresh();
-	// usleep(1000000);
+// 	temp.push_back(make_pair(y,x));
+// 	clear();
+// 	// printw("start pos: %d,%d", y,x);
+// 	// printw("\nend pos: %d,%d", m_exit_gate.m_ypos,m_exit_gate.m_xpos);
+// 	// refresh();
+// 	// usleep(1000000);
 
-	//očísluj
-	while(temp[0].first != m_exit_gate.m_ypos || temp[0].second != m_exit_gate.m_xpos){ 
+// 	//očísluj
+// 	while(temp[0].first != m_exit_gate.m_ypos || temp[0].second != m_exit_gate.m_xpos){ 
 
-		if(y != 0 && map[y - 1][x] == 0){//y != 0 kvůli pozici -1
-			temp.push_back(make_pair(y - 1, x));
-			map[y - 1][x] = map[y][x] + 1;
-			// move(y-1,x);
-			// addch(map[y-1][x]);
-			// refresh();
-			// usleep(19000);
-		}
+// 		if(y != 0 && map[y - 1][x] == 0){//y != 0 kvůli pozici -1
+// 			temp.push_back(make_pair(y - 1, x));
+// 			map[y - 1][x] = map[y][x] + 1;
+// 			// move(y-1,x);
+// 			// addch(map[y-1][x]);
+// 			// refresh();
+// 			// usleep(19000);
+// 		}
 		
-		if(x != 0 && map[y][x - 1] == 0){//x != 0 kvůli pozici -1
-			temp.push_back(make_pair(y, x - 1));
-			map[y][x - 1] = map[y][x] + 1;
-			// move(y,x-1);
-			// addch(map[y][x-1]);
-			// refresh();
-			// usleep(19000);
-		}
+// 		if(x != 0 && map[y][x - 1] == 0){//x != 0 kvůli pozici -1
+// 			temp.push_back(make_pair(y, x - 1));
+// 			map[y][x - 1] = map[y][x] + 1;
+// 			// move(y,x-1);
+// 			// addch(map[y][x-1]);
+// 			// refresh();
+// 			// usleep(19000);
+// 		}
 
-		if(y != m_maxheight - 4 && map[y + 1][x] == 0){
-			temp.push_back(make_pair(y + 1, x));
-			map[y + 1][x] = map[y][x] + 1;
-			// move(y+1,x);
-			// addch(map[y+1][x]);
-			// refresh();
-			// usleep(19000);
-		}
+// 		if(y != m_maxheight - 4 && map[y + 1][x] == 0){
+// 			temp.push_back(make_pair(y + 1, x));
+// 			map[y + 1][x] = map[y][x] + 1;
+// 			// move(y+1,x);
+// 			// addch(map[y+1][x]);
+// 			// refresh();
+// 			// usleep(19000);
+// 		}
 
-		if(x != m_maxwidth - 1 && map[y][x + 1] == 0){
-			temp.push_back(make_pair(y, x + 1));
-			map[y][x + 1] = map[y][x] + 1;
-			// move(y,x+1);
-			// addch(map[y][x+1]);
-			// refresh();
-			// usleep(19000);
-		}
+// 		if(x != m_maxwidth - 1 && map[y][x + 1] == 0){
+// 			temp.push_back(make_pair(y, x + 1));
+// 			map[y][x + 1] = map[y][x] + 1;
+// 			// move(y,x+1);
+// 			// addch(map[y][x+1]);
+// 			// refresh();
+// 			// usleep(19000);
+// 		}
 
-		if(!temp.empty())
-			temp.erase(temp.begin());
+// 		if(!temp.empty())
+// 			temp.erase(temp.begin());
 
-		y = temp[0].first;
-		x = temp[0].second;
-	}
+// 		y = temp[0].first;
+// 		x = temp[0].second;
+// 	}
 
-	map[start.m_ypos][start.m_xpos] = 0;
+// 	map[start.m_ypos][start.m_xpos] = 0;
 
 	 
-	//najdi cestu zpět, z cíle do počátku, path[0] = cíl, path[max] = počátek
-	vector<pair<int,int> > path;
+// 	//najdi cestu zpět, z cíle do počátku, path[0] = cíl, path[max] = počátek
+// 	vector<pair<int,int> > path;
 
-	y = m_exit_gate.m_ypos;
-	x = m_exit_gate.m_xpos;
+// 	y = m_exit_gate.m_ypos;
+// 	x = m_exit_gate.m_xpos;
 	
-	path.push_back(make_pair(y, x));
-	clear();
-	// printw("POnd pos: %d,%d", y,x);
-	// refresh();
-	// usleep(1000000);
+// 	path.push_back(make_pair(y, x));
+// 	clear();
+// 	// printw("POnd pos: %d,%d", y,x);
+// 	// refresh();
+// 	// usleep(1000000);
 	
-	int i = 0;
+// 	int i = 0;
 
-	// for(int i = 0; i < m_m_maxheight-4; i++)
-	// 	for(int j = 0; j < m_maxwidth; j++){
-	// 		mvprintw(i,j,"%c",map[i][j]);
-	// 		refresh();
-	// 	}
+// 	// for(int i = 0; i < m_m_maxheight-4; i++)
+// 	// 	for(int j = 0; j < m_maxwidth; j++){
+// 	// 		mvprintw(i,j,"%c",map[i][j]);
+// 	// 		refresh();
+// 	// 	}
 
-	// usleep(1900000);
-	// clear();
-	// refresh();
-	while(!(path[path.size() - 1].first == start.m_ypos && path[path.size() - 1].second == start.m_xpos)){ 
-		if(path.size() > 1){
-			i++;
-			// y = path[path.size() - 1].first;
-			// x = path[path.size() - 1].second;
-			y = path[path.size() - 1].first;
-			x = path[path.size() - 1].second;
-			// mvprintw(0,0,"%d,%d",y,x);
-			// refresh();
-			// usleep(10000);
+// 	// usleep(1900000);
+// 	// clear();
+// 	// refresh();
+// 	while(!(path[path.size() - 1].first == start.m_ypos && path[path.size() - 1].second == start.m_xpos)){ 
+// 		if(path.size() > 1){
+// 			i++;
+// 			// y = path[path.size() - 1].first;
+// 			// x = path[path.size() - 1].second;
+// 			y = path[path.size() - 1].first;
+// 			x = path[path.size() - 1].second;
+// 			// mvprintw(0,0,"%d,%d",y,x);
+// 			// refresh();
+// 			// usleep(10000);
 
-		}
+// 		}
 
-		if(y != 0 && map[y - 1][x] == map[y][x] - 1){
-			path.push_back(make_pair(y - 1, x));
-			// move(y-1,x);
-			// addch(map[y-1][x]);
-			// refresh();
-			// usleep(10000);
-			continue;
-		}
+// 		if(y != 0 && map[y - 1][x] == map[y][x] - 1){
+// 			path.push_back(make_pair(y - 1, x));
+// 			// move(y-1,x);
+// 			// addch(map[y-1][x]);
+// 			// refresh();
+// 			// usleep(10000);
+// 			continue;
+// 		}
 
-		if(x != 0 && map[y][x - 1] == map[y][x] - 1){
-			path.push_back(make_pair(y, x - 1));
-			// move(y,x-1);
-			// addch(map[y][x-1]);
-			// refresh();
-			// usleep(10000);
-			continue;
-		}
+// 		if(x != 0 && map[y][x - 1] == map[y][x] - 1){
+// 			path.push_back(make_pair(y, x - 1));
+// 			// move(y,x-1);
+// 			// addch(map[y][x-1]);
+// 			// refresh();
+// 			// usleep(10000);
+// 			continue;
+// 		}
 
-		if(y != m_maxheight - 4 && map[y + 1][x] == map[y][x] - 1){
-			path.push_back(make_pair(y + 1, x));
-			// move(y+1,x);
-			// addch(map[y+1][x]);
-			// refresh();
-			// usleep(10000);
-			continue;
-		}
+// 		if(y != m_maxheight - 4 && map[y + 1][x] == map[y][x] - 1){
+// 			path.push_back(make_pair(y + 1, x));
+// 			// move(y+1,x);
+// 			// addch(map[y+1][x]);
+// 			// refresh();
+// 			// usleep(10000);
+// 			continue;
+// 		}
 		
-		if(x != m_maxwidth - 1 && map[y][x + 1] == map[y][x] - 1){
-			path.push_back(make_pair(y, x + 1));
-			// move(y,x+1);
-			// addch(map[y][x+1]);
-			// refresh();
-			// usleep(10000);
-			continue;
-		}
-	}
+// 		if(x != m_maxwidth - 1 && map[y][x + 1] == map[y][x] - 1){
+// 			path.push_back(make_pair(y, x + 1));
+// 			// move(y,x+1);
+// 			// addch(map[y][x+1]);
+// 			// refresh();
+// 			// usleep(10000);
+// 			continue;
+// 		}
+// 	}
 
-	return path;
-}
+// 	return path;
+// }
 
 void CMap::NextFrame (){
 	PrintBorders('f');

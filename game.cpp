@@ -132,6 +132,230 @@ void CGame::StartGame(CMap map){
 	}	
 }
 
+void CGame::ClearMap(){
+	m_map.resize(m_maxheight);
+	for(int i = 0; i < m_maxheight; i++){
+		m_map[i].resize(m_maxwidth);
+	}
+
+	for(unsigned int i = 0; i < v_gates.size(); i++){
+		for(int i = 0; i < m_maxheight; i++)
+			for(int j = 0; j < m_maxwidth; j++)
+				m_map[i][j] = 0;
+	}
+}
+
+vector<pair<int,int> > CGame::FindPath(CGate & start){
+	std::vector<pair<int, int> > temp; //uchovává souřadnice
+
+	int y = start.m_ypos;
+	int x = start.m_xpos;
+
+	temp.push_back(make_pair(y,x));
+	clear();
+	// printw("start pos: %d,%d", y,x);
+	// printw("\nend pos: %d,%d", m_exit_gate.m_ypos,m_exit_gate.m_xpos);
+	// refresh();
+	// usleep(1000000);
+
+	//očísluj
+	while(temp[0].first != m_exit_gate.m_ypos || temp[0].second != m_exit_gate.m_xpos){ 
+
+		if(y != 0 && m_map[y - 1][x] == 0){//y != 0 kvůli pozici -1
+			temp.push_back(make_pair(y - 1, x));
+			m_map[y - 1][x] = m_map[y][x] + 1;
+			// move(y-1,x);
+			// addch(map[y-1][x]);
+			// refresh();
+			// usleep(19000);
+		}
+		
+		if(x != 0 && m_map[y][x - 1] == 0){//x != 0 kvůli pozici -1
+			temp.push_back(make_pair(y, x - 1));
+			m_map[y][x - 1] = m_map[y][x] + 1;
+			// move(y,x-1);
+			// addch(map[y][x-1]);
+			// refresh();
+			// usleep(19000);
+		}
+
+		if(y != m_maxheight - 4 && m_map[y + 1][x] == 0){
+			temp.push_back(make_pair(y + 1, x));
+			m_map[y + 1][x] = m_map[y][x] + 1;
+			// move(y+1,x);
+			// addch(map[y+1][x]);
+			// refresh();
+			// usleep(19000);
+		}
+
+		if(x != m_maxwidth - 1 && m_map[y][x + 1] == 0){
+			temp.push_back(make_pair(y, x + 1));
+			m_map[y][x + 1] = m_map[y][x] + 1;
+			// move(y,x+1);
+			// addch(map[y][x+1]);
+			// refresh();
+			// usleep(19000);
+		}
+
+		if(!temp.empty())
+			temp.erase(temp.begin());
+
+		y = temp[0].first;
+		x = temp[0].second;
+	}
+
+	m_map[start.m_ypos][start.m_xpos] = 0;
+
+	 
+	//najdi cestu zpět, z cíle do počátku, path[0] = cíl, path[max] = počátek
+	vector<pair<int,int> > path;
+
+	y = m_exit_gate.m_ypos;
+	x = m_exit_gate.m_xpos;
+	
+	path.push_back(make_pair(y, x));
+	clear();
+	// printw("POnd pos: %d,%d", y,x);
+	// refresh();
+	// usleep(1000000);
+	
+	int i = 0;
+
+	// for(int i = 0; i < m_m_maxheight-4; i++)
+	// 	for(int j = 0; j < m_maxwidth; j++){
+	// 		mvprintw(i,j,"%c",map[i][j]);
+	// 		refresh();
+	// 	}
+
+	// usleep(1900000);
+	// clear();
+	// refresh();
+	while(!(path[path.size() - 1].first == start.m_ypos && path[path.size() - 1].second == start.m_xpos)){ 
+		if(path.size() > 1){
+			i++;
+			// y = path[path.size() - 1].first;
+			// x = path[path.size() - 1].second;
+			y = path[path.size() - 1].first;
+			x = path[path.size() - 1].second;
+			// mvprintw(0,0,"%d,%d",y,x);
+			// refresh();
+			// usleep(10000);
+
+		}
+
+		if(y != 0 && m_map[y - 1][x] == m_map[y][x] - 1){
+			path.push_back(make_pair(y - 1, x));
+			// move(y-1,x);
+			// addch(map[y-1][x]);
+			// refresh();
+			// usleep(10000);
+			continue;
+		}
+
+		if(x != 0 && m_map[y][x - 1] == m_map[y][x] - 1){
+			path.push_back(make_pair(y, x - 1));
+			// move(y,x-1);
+			// addch(map[y][x-1]);
+			// refresh();
+			// usleep(10000);
+			continue;
+		}
+
+		if(y != m_maxheight - 4 && m_map[y + 1][x] == m_map[y][x] - 1){
+			path.push_back(make_pair(y + 1, x));
+			// move(y+1,x);
+			// addch(map[y+1][x]);
+			// refresh();
+			// usleep(10000);
+			continue;
+		}
+		
+		if(x != m_maxwidth - 1 && m_map[y][x + 1] == m_map[y][x] - 1){
+			path.push_back(make_pair(y, x + 1));
+			// move(y,x+1);
+			// addch(map[y][x+1]);
+			// refresh();
+			// usleep(10000);
+			continue;
+		}
+	}
+
+	return path;
+}
+
+void CGame::GenerateMap(){
+	ClearMap();
+
+	std::random_device rnd;
+	std::mt19937 eng(rnd());
+	std::uniform_int_distribution<int> gen(1, 4); //n-tí souřadnice
+
+	for(int i = 0; i < m_maxwidth - 2; i++){
+		v_gates[i].path.push_back(std::make_pair(v_gates[i].m_ypos, v_gates[i].m_xpos));
+	}
+	
+	for(unsigned int i = 0; i < v_gates.size() - 1; i++)
+		for(unsigned int position_n = 0; position_n < v_gates[i].path.size() - 1; position_n += gen(eng)){
+			v_gates[i].path = FindPath(v_gates[i]);
+
+			InsertObstacle(v_gates[i].path[position_n]);//na jakou souřadnici
+		}
+}
+
+void CGame::GenerateWall(const int & dylka_zdi, const int & start_y, const std::pair<int,int> & position){
+	for(int i = 0; i < dylka_zdi; i++){
+		if(start_y + i > 0)
+			m_map[start_y + i][position.second] = '#';
+	}
+}
+
+void CGame::GenerateBasicTower(int & placement, const std::pair<int,int> & position){
+	for(;placement < 1; placement++);
+	
+	m_map[placement][position.second] = 'T';
+	v_towers.push_back(new CBasicTower (placement, position.second));
+}
+
+void CGame::GenerateAdvancedTower(int & placement, const std::pair<int,int> & position){
+	for(;placement < 1; placement++);
+	
+	m_map[placement][position.second] = 'I';
+	v_towers.push_back(new CAdvancedTower (placement, position.second));
+}
+
+void CGame::InsertObstacle(const std::pair<int,int> & position){
+	std::random_device rnd;
+	std::mt19937 eng(rnd());
+	std::uniform_int_distribution<int> dist(1, 3); //jakej objekt
+
+	std::uniform_int_distribution<int> rozmezi_zed(1, 10);
+	int dylka_zdi = rozmezi_zed(eng);
+
+	std::uniform_int_distribution<int> rozmezi_start_y(position.first - dylka_zdi, position.first); //jakej objekt
+	int start_y = rozmezi_start_y(eng);
+
+	std::uniform_int_distribution<int> rozmezi_basic(-1, 1);
+	int basic_pos = rozmezi_basic(eng);
+
+	std::uniform_int_distribution<int> rozmezi_advanced(-2, 2);
+	int advanced_pos = rozmezi_advanced(eng);
+
+
+	int choice = dist(eng);
+	switch(choice){
+		case 1://WALL
+			GenerateWall(dylka_zdi, start_y, position);
+			break;
+		case 2:// T
+			GenerateBasicTower(basic_pos, position);
+			break;
+		case 3:// I
+			GenerateAdvancedTower(advanced_pos, position);
+			break;
+	}
+
+}
+
 void CGame::NewGame(){
 	clear();
 	v_towers.clear();
@@ -161,6 +385,8 @@ void CGame::NewGame(){
 		v_gates.push_back(gate1);
 		v_gates.push_back(gate2);
 		v_gates.push_back(gate3);
+
+		m_exit_gate = gate3;
 	}
 	else{
 		std::uniform_int_distribution<int> prvni_tretina(1, (m_maxheight - 3) / 3);
@@ -176,38 +402,40 @@ void CGame::NewGame(){
 		v_gates.push_back(gate2);
 		v_gates.push_back(gate3);
 		v_gates.push_back(gate4);
+
+		m_exit_gate = gate4;
 	}
 
-	v_towers.push_back(new CAdvancedTower (8, 50));
-	v_towers.push_back(new CAdvancedTower (4, 45));
-	v_towers.push_back(new CBasicTower (3, 25));
-	v_towers.push_back(new CAdvancedTower (m_maxheight-4, 8));
-	v_towers.push_back(new CBasicTower (m_maxheight-4, 7));
+	// v_towers.push_back(new CAdvancedTower (8, 50));
+	// v_towers.push_back(new CAdvancedTower (4, 45));
+	// v_towers.push_back(new CBasicTower (3, 25));
+	// v_towers.push_back(new CAdvancedTower (m_maxheight-4, 8));
+	// v_towers.push_back(new CBasicTower (m_maxheight-4, 7));
 
 	// v_borders.push_back(TBorder(4,25));
 	// v_borders.push_back(TBorder(3,26));
 	// v_borders.push_back(TBorder(4,46));
 
 
-	int random = rozmezi(eng);
-	for(int i = 1; i < m_maxwidth-6;i++){
-		if(i == random){
-			int dylka_zdi = rozmezi_vyska(eng);
-			if(rozsudek(eng) % 2 == 0){
-				for(int j = 0; j < dylka_zdi; j++){
-					v_borders.push_back(TBorder(j, i));
-				}
-			}
-			else
-				for(int j = m_maxheight - 4; j > m_maxheight - 4 - dylka_zdi; j--)
-					v_borders.push_back(TBorder(j, i));
+	// int random = rozmezi(eng);
+	// for(int i = 1; i < m_maxwidth-6;i++){
+	// 	if(i == random){
+	// 		int dylka_zdi = rozmezi_vyska(eng);
+	// 		if(rozsudek(eng) % 2 == 0){
+	// 			for(int j = 0; j < dylka_zdi; j++){
+	// 				v_borders.push_back(TBorder(j, i));
+	// 			}
+	// 		}
+	// 		else
+	// 			for(int j = m_maxheight - 4; j > m_maxheight - 4 - dylka_zdi; j--)
+	// 				v_borders.push_back(TBorder(j, i));
 
 			
 			
-			random += 1 + rozmezi(eng);
-		}
-	}
-
+	// 		random += 1 + rozmezi(eng);
+	// 	}
+	// }
+	GenerateMap();
 
 	SetExit();
 	SetGoal();
@@ -265,6 +493,16 @@ bool CGame::LoadGame(ifstream & file){
 	usleep(1900000);
 
 	SetExit();
+
+	ClearMap();
+
+	for(unsigned int i = 0; i < v_towers.size(); i++){
+		m_map[v_towers[i]->m_ypos][v_towers[i]->m_xpos] = -8;
+	}
+
+	for(unsigned int i = 0; i < v_gates.size(); i++){
+		v_gates[i].path = FindPath(m_exit_gate);
+	}
 
 	CMap map(v_towers, v_gates, v_attackers, v_borders, m_maxheight, m_maxwidth, m_exit_gate);
 	
@@ -345,6 +583,10 @@ bool CGame::CreateGate(const char & type, const int & ypos, const int & xpos){
 		return false;
 
 	v_gates.push_back(CGate(type, ypos, xpos, v_gates.size()+1));
+
+	if(type != '<')
+		m_exit_gate = v_gates[v_gates.size() - 1];
+
 	return true;
 }
 
