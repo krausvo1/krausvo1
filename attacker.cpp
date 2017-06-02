@@ -12,7 +12,7 @@ CAttacker::CAttacker(const char & type, const CGate & start, const int & number,
 CAttacker::CAttacker(const char & type, const int & ypos, const int & xpos, const int & number, const int & health): //LOAD 
 					m_attacker_type(type), m_ypos(ypos), m_xpos(xpos), 
 					m_hit(false), m_health(health), m_number(number), m_start(CGate()),
-					m_moves(0), m_attacker_won(false){}
+					m_moves(1), m_attacker_won(false){}
 
 
 bool CAttacker::AssignPath(const CGate & gate){

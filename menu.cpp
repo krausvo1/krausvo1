@@ -7,10 +7,10 @@
 #include <cstring>
 #include <fstream>
 #include <vector>
+#include <curses.h>
 #include "tower.h"
 #include "gate.h"
 #include "attacker.h"
-#include "game.h"
 
 using namespace std;
 
@@ -19,6 +19,7 @@ CMenu::CMenu(){
 	noecho();
 	curs_set(0);
 	keypad(stdscr, true);
+	getmaxyx(stdscr, maxheight, maxwidth);
 }
 
 void CMenu::Start(){
@@ -108,7 +109,6 @@ bool CMenu::Load(){
 		}
 	}
 	else{
-
 		if(!LoadGame(file)){
 			Load();
 		}

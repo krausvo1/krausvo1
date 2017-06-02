@@ -29,6 +29,8 @@ public:
 
 	void SaveGame(const CMap & map);
 
+	void RestrictArea();
+
 	void SetExit();
 	void SetGoal();
 	void CheckGoal();
@@ -43,7 +45,9 @@ public:
 
 	void GenerateMap();
 
-	void GenerateWall(const int & dylka_zdi, const int & start_y, std::pair<int,int> position);
+	void GenerateGates();
+
+	void GenerateWall(std::pair<int,int> position);
 
 	void GenerateTower(std::pair<int,int> position1, 
 					   std::pair<int,int> position2, 
@@ -56,7 +60,7 @@ public:
 											    std::pair<int,int> position2, 
 											    std::pair<int,int> position3);
 
-	void InsertObstacle(std::pair<int,int> position1, 
+	void PlaceObstacle(std::pair<int,int> position1, 
 					    std::pair<int,int> position2, 
 					    std::pair<int,int> position3, const int & eliminate);
 
@@ -91,6 +95,8 @@ private:
 
 	std::mt19937 m_engine;
 	std::random_device m_seed;
+
+	std::vector<std::pair<int,int>> v_restricted_area;
 
 };
 

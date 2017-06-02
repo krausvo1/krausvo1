@@ -20,6 +20,7 @@ bool CAdvancedAttacker::Move(){
 	m_ypos = m_start.path[m_start.path.size() - m_moves].first;
 	m_xpos = m_start.path[m_start.path.size() - m_moves].second;	
 
+	
 	move(m_ypos, m_xpos);
 	addch(m_attacker_type);
 

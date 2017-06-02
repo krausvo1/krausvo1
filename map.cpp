@@ -22,19 +22,18 @@ CMap::CMap(const std::vector<CTower*> & towers, const std::vector<CGate> & gates
 {
 	for(unsigned int i = 0; i < v_gates.size(); i++){
 		for(unsigned int j = 0; j < v_attackers.size(); j++){
-			if(v_attackers[j]->m_start.path.empty() && v_gates[i].m_gate_type != '<')
+			if(v_attackers[j]->m_start.path.empty() && v_gates[i].m_gate_type != '<'){
 				v_attackers[j]->AssignPath(v_gates[i]);
+			}
+
 		}
 	}
-	
 }
 
 CMap::~CMap(){
 	for(unsigned int i = m_first_not_loaded; i < v_attackers.size(); i++)
           delete v_attackers[i];  
 }
-
-
 
 void CMap::NextFrame (){
 	PrintBorders();
@@ -111,14 +110,13 @@ void CMap::CheckCollisions(){
 	}
 }
 
-
 void CMap::PrintAttackers(){
 	start_color();
 	init_pair(1,COLOR_RED, COLOR_BLACK);
 	
 	m_attackers_alive = 0;
 	
-	for(unsigned int i=0; i < v_attackers.size(); i++){
+	for(unsigned int i = 0; i < v_attackers.size(); i++){
 		if(v_attackers[i]->m_hit){
 			if(m_logs_on)
 				v_logs.push_back(TLog(v_attackers[i]->m_number, v_attackers[i]->m_health, 
