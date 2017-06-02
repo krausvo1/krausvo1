@@ -15,7 +15,7 @@ public:
 	CAttacker(const char & type, const int & ypos, const int & xpos, const int & number, const int & health); //LOAD
 	virtual ~CAttacker(){};
 	virtual bool Move() = 0;
-	bool AssignPath(const CGate & gate);
+	void AssignPath(const CGate & gate);
 	bool CheckWin();
 	bool IsInGame() const;
 	virtual void TakeHit(const int & damage, const bool & stun) = 0;
@@ -40,6 +40,8 @@ public:
 	bool m_attacker_won;
 
 	bool m_stunned;
+
+	bool m_is_assigned;
 };
 
 #endif

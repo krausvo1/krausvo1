@@ -20,14 +20,6 @@ CMap::CMap(const std::vector<CTower*> & towers, const std::vector<CGate> & gates
 		   m_first_not_loaded(attackers.size()), m_maxheight(maxheight), m_maxwidth(maxwidth), m_exit_gate(exit), 
 		   m_attackers_won(0), m_logs_on(true)
 {
-	for(unsigned int i = 0; i < v_gates.size(); i++){
-		for(unsigned int j = 0; j < v_attackers.size(); j++){
-			if(v_attackers[j]->m_start.path.empty() && v_gates[i].m_gate_type != '<'){
-				v_attackers[j]->AssignPath(v_gates[i]);
-			}
-
-		}
-	}
 }
 
 CMap::~CMap(){

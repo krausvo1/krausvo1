@@ -38,6 +38,8 @@ public:
 
 	bool CheckVictory(const int & attackers_won);
 	void AssignBorders();
+	bool AssignPaths();
+
 
 	void ClearMap();
 
@@ -92,9 +94,10 @@ private:
 
 	int m_maxheight;
 	int m_maxwidth;
+	
+	std::random_device m_seed;
 
 	std::mt19937 m_engine;
-	std::random_device m_seed;
 
 	std::vector<std::pair<int,int>> v_restricted_area;
 

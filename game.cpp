@@ -13,7 +13,7 @@
 #include "map.h"
 #include "game.h"
 
-CGame::CGame() : m_goal(0), m_maxheight(0), m_maxwidth(0), m_engine(){
+CGame::CGame() : m_goal(0), m_maxheight(0), m_maxwidth(0), m_engine(m_seed()){
 	srand(time(NULL));
 }
 
@@ -46,13 +46,6 @@ void CGame::SetExit(){
 
 void CGame::SetGoal(){
 	m_goal = rand() % 15 + 5;
-}
-
-void CGame::AssignBorders(){
-	for(unsigned int i = 0; i < v_towers.size(); i++){
-			v_towers[i]->v_borders = v_borders;
-			v_towers[i]->CheckRange();
-	}
 }
 
 bool CGame::CheckVictory(const int & attackers_won){
@@ -340,12 +333,7 @@ vector<pair<int,int> > CGame::FindPath(CGate & start){
 		}
 
 		round++;
-		if(round > 1000000){
-			clear();
-			mvprintw(0,0,"NEW GAME");
-			refresh();
-			usleep(100000);
-			NewGame();
+		if(round > 100000){
 			vector<pair<int,int>> error;
 			return error;
 		}
@@ -357,8 +345,6 @@ vector<pair<int,int> > CGame::FindPath(CGate & start){
 }
 
 void CGame::GenerateMap(){
-	ClearMap();
-
 	std::uniform_int_distribution<int> gen(7, 10); //n-tá souřadnice
 
 	for(int choice = 2; choice > 0; choice--){
@@ -372,8 +358,8 @@ void CGame::GenerateMap(){
 
 				ClearMap();
 				
-				while(v_gates[i].path.size() == 0){
-					v_gates[i].path = FindPath(v_gates[i]);
+				while(v_gates[i].path.size() == 0){ 
+					v_gates[i].path = FindPath(v_gates[i]);///////////////////////////
 					v_borders.pop_back();
 				}
 
@@ -388,7 +374,7 @@ void CGame::GenerateMap(){
 		v_gates[i].path = FindPath(v_gates[i]);
 		
 		while(v_gates[i].path.size() == 0){
-			v_gates[i].path = FindPath(v_gates[i]);
+			v_gates[i].path = FindPath(v_gates[i]);//////////////////////////////////
 			v_borders.pop_back();
 		}
 	}
@@ -564,6 +550,11 @@ void CGame::NewGame(){
 }
 
 bool CGame::LoadGame(ifstream & file){
+	v_towers.clear();
+	v_attackers.clear();
+	v_gates.clear();
+	v_borders.clear();
+
 	getmaxyx(stdscr, m_maxheight, m_maxwidth);
 
 	int maxheightLoaded, maxwidthLoaded;
@@ -603,21 +594,24 @@ bool CGame::LoadGame(ifstream & file){
 		return false;
 	}
 
-	printw("Game loaded!");
-	refresh();
-	usleep(190000);
-
-	SetExit();
-
-
 	for(unsigned int i = 0; i < v_gates.size(); i++){
 		if(v_gates[i].m_gate_type != '<'){
 			ClearMap();
 			v_gates[i].path = FindPath(v_gates[i]);
 		}
 	}
+	
+	if(!AssignPaths())
+		return false;
 
 	AssignBorders();
+
+	SetExit();
+	
+	printw("Game loaded!");
+	refresh();
+	usleep(190000);
+	clear();
 
 	CMap map(v_towers, v_gates, v_attackers, v_borders, m_maxheight, m_maxwidth, m_exit_gate);
 	
@@ -625,6 +619,31 @@ bool CGame::LoadGame(ifstream & file){
 
 	nodelay(stdscr, false);
 	endwin();
+
+	return true;
+}
+
+void CGame::AssignBorders(){
+	for(unsigned int i = 0; i < v_towers.size(); i++){
+			v_towers[i]->v_borders = v_borders;
+			v_towers[i]->CheckRange();
+	}
+}
+
+bool CGame::AssignPaths(){
+	for(unsigned int i = 0; i < v_gates.size(); i++)
+		for(unsigned int j = 0; j < v_attackers.size(); j++){
+			if(!v_attackers[j]->m_is_assigned && v_gates[i].m_gate_type != '<')
+			    v_attackers[j]->AssignPath(v_gates[i]);
+		}
+
+	for(unsigned int i = 0; i < v_attackers.size(); i++)
+		if(!v_attackers[i]->m_is_assigned){
+			printw("Error occured while placing attackers on their paths - %d. attacker is off the path!", i + 1);
+			refresh();
+			usleep(2400000);		
+			return false;
+		}
 
 	return true;
 }
@@ -699,7 +718,7 @@ bool CGame::CreateGate(const char & type, const int & ypos, const int & xpos){
 
 	v_gates.push_back(CGate(type, ypos, xpos, v_gates.size()+1));
 
-	if(type != '<')
+	if(type == '<')
 		m_exit_gate = v_gates[v_gates.size() - 1];
 
 	return true;
