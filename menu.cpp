@@ -19,7 +19,6 @@ CMenu::CMenu(){
 	noecho();
 	curs_set(0);
 	keypad(stdscr, true);
-	getmaxyx(stdscr, maxheight, maxwidth);
 }
 
 void CMenu::Start(){
@@ -67,7 +66,7 @@ void CMenu::Start(){
 	refresh();
 }
 
-bool CMenu::Load(){
+void CMenu::Load(){
 	clear();
 	printw("Load game - please type the exact name of the savefile (max. 100 characters)");
 	refresh();
