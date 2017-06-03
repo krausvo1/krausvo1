@@ -8,6 +8,10 @@ using namespace std;
 #ifndef ATTACKER_H
 #define ATTACKER_H
 
+#define A_BASIC '&'
+#define A_ADVANCED '@'
+#define A_DEAD 'X'
+
 
 	/*!
 	* Parent class representing a atacker
@@ -24,7 +28,7 @@ public:
 	* @param number ID number of the attacker
 	* @param health number of health the attacker has
 	*/
-	CAttacker(const char & type, const int & ypos, const int & xpos, const int & number, const int & health);
+	CAttacker(const char & type, const int & ypos, const int & xpos, const int & ID, const int & health);
 
 	/*!
 	* Constructor used to initialise a new basic attacker
@@ -33,7 +37,7 @@ public:
 	* @param number ID number of the attacker
 	* @param health number of health the attacker starts with
 	*/
-	CAttacker(const char & type, const CGate & start, const int & number, const int & health);
+	CAttacker(const char & type, const CGate & start, const int & ID, const int & health);
 
 	/*!
 	* Implicit destructor
@@ -77,6 +81,36 @@ public:
 	*/
 	virtual void SetIsEscorted(const bool & escorted){}
 
+	char AttackerType() const;
+
+	int AttackerYpos() const;
+
+	int AttackerXpos() const;
+
+	int AttackerRealYpos() const;
+
+	int AttackerRealXpos() const;
+
+	bool IsHit() const;
+
+	void SetHit(const int & hit);
+
+	int AttackerHealth() const;
+
+	int AttackerID() const;
+
+	int AttackerMoves() const;
+
+	bool HasWon() const;
+
+	bool IsAssigned() const;
+
+	bool IsStunned() const;
+
+	CGate m_start;
+
+
+protected:
 
 	char m_attacker_type;
 
@@ -89,16 +123,14 @@ public:
 	bool m_hit;
 
 	int m_health;
-	int m_number;
-
-	CGate m_start;
+	int m_attacker_ID;
 
 	int m_moves;
 	bool m_attacker_won;
 
 	bool m_stunned;
 
-	bool m_is_assigned;
+	bool m_assigned;
 };
 
 #endif

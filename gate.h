@@ -3,6 +3,7 @@
 
 #include <vector>
 
+#define G_EXIT '<'
 	/*!
 	* Class representing a gate which attackers use to enter/exit the game
 	*/
@@ -40,6 +41,24 @@ public:
 	*/
 	CGate & operator= (const CGate & src);
 
+	char GateType() const;
+
+	int GateYpos() const;
+
+	int GateXpos() const;
+
+	int GateID() const;
+
+	void SetGateYpos(const int & ypos);
+
+	void SetGateXpos(const int & xpos);
+	
+	void SetGateType(const char & type);
+
+	//! vector of coordinates which are followed by attackers coming from this gat
+	std::vector<std::pair<int,int>> path;
+
+private:
 	//! the type of the gate (enter/exit)
 	char m_gate_type;
 	
@@ -51,9 +70,6 @@ public:
 	
 	//! ID number of the gate
 	int m_gate_ID;
-
-	//! vector of coordinates which are followed by attackers coming from this gat
-	std::vector<std::pair<int,int>> path;
 };
 
 #endif

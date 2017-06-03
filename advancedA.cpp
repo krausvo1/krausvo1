@@ -1,11 +1,11 @@
 #include "advancedA.h"
 
-CAdvancedAttacker::CAdvancedAttacker(const int & ypos, const int & xpos, const int & number, const int & health):
-							   CAttacker('@', ypos, xpos, number, health), m_stunned(false){} //LOAD
+CAdvancedAttacker::CAdvancedAttacker(const int & ypos, const int & xpos, const int & ID, const int & health):
+							   CAttacker(A_ADVANCED, ypos, xpos, ID, health){} //LOAD
 
 
-CAdvancedAttacker::CAdvancedAttacker(const CGate & start, const int & number):
-							   CAttacker('@', start, number,  200), m_stunned(false){} //NEW
+CAdvancedAttacker::CAdvancedAttacker(const CGate & start, const int & ID):
+							   CAttacker(A_ADVANCED, start, ID,  200){} //NEW
 
 
 void CAdvancedAttacker::TakeHit(const int & damage, const bool & stun){
@@ -15,7 +15,7 @@ void CAdvancedAttacker::TakeHit(const int & damage, const bool & stun){
 
 bool CAdvancedAttacker::Move(){
 	if(!(m_health > 0))
-		m_attacker_type = 'X';
+		m_attacker_type = A_DEAD;
 
 	m_ypos = m_start.path[m_start.path.size() - m_moves].first;
 	m_xpos = m_start.path[m_start.path.size() - m_moves].second;	

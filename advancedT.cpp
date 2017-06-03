@@ -3,7 +3,7 @@
 #include <cmath>
 
 CAdvancedTower::CAdvancedTower(const int & ypos, const int & xpos):
-					    	   CTower('I', ypos, xpos), m_stun_ready(true), m_use_stun(false){}
+					    	   CTower(T_ADVANCED, ypos, xpos), m_stun_ready(true), m_use_stun(false){}
 
 void CAdvancedTower::Shoot(CAttacker & attacker){
 	if(m_use_stun)
@@ -15,7 +15,7 @@ void CAdvancedTower::Shoot(CAttacker & attacker){
 }
 
 int CAdvancedTower::ChooseTarget() const{
-	return v_targets[0]->m_number;
+	return v_targets[0]->AttackerID();
 }
 
 void CAdvancedTower::ChargeStun(){
@@ -25,14 +25,14 @@ void CAdvancedTower::ChargeStun(){
 bool CAdvancedTower::InRange(const CAttacker & attacker){
 	for(int j = - 1; j < m_range; j++)
 		for(int k = - 1; k < m_range; k++)
-			if((m_ypos + j == attacker.real_ypos) && (m_xpos + k == attacker.real_xpos) 
+			if((m_ypos + j == attacker.AttackerRealYpos()) && (m_xpos + k == attacker.AttackerRealXpos()) 
 				&& ClearShot(attacker)){
 				m_use_stun = false;
 				return true;
 			}
 
-	if(((std::abs(attacker.real_ypos - m_ypos) == 2 && m_xpos == attacker.real_xpos) ||
-	   (std::abs(attacker.real_xpos - m_xpos) == 2 && m_ypos == attacker.real_ypos)) &&
+	if(((std::abs(attacker.AttackerRealYpos() - m_ypos) == 2 && m_xpos == attacker.AttackerRealXpos()) ||
+	   (std::abs(attacker.AttackerRealXpos() - m_xpos) == 2 && m_ypos == attacker.AttackerRealYpos())) &&
 		ClearShot(attacker)){
 		m_use_stun = true;
 		return true;

@@ -112,6 +112,4 @@ void CMenu::Load(){
 			Load();
 		}
 	}
-
-	return true;
 }

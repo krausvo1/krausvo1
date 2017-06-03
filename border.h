@@ -1,12 +1,12 @@
 #ifndef BORDER_H
 #define BORDER_H
 
+#define BORDER '#'
+
 	/*!
-	* Structure representing a border (wall)
+	* Structure representing a border (piece of wall)
 	*/
 struct TBorder{
-public:
-
 	/*!
 	* Constructor
 	* @param ypos vertical position of the border
@@ -14,7 +14,6 @@ public:
 	*/
 	TBorder(const int & ypos, const int & xpos) : t_ypos(ypos), t_xpos(xpos) {}
 
-private:
 	//! Vertical position of the border
 	int t_ypos;
 

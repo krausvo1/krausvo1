@@ -1,8 +1,12 @@
 #ifndef TOWER_H
 #define TOWER_H
+#include <vector>
 #include "attacker.h"
 #include "border.h"
-#include <vector>
+
+#define T_BASIC 'T'
+#define T_ADVANCED 'I'
+
 
 class CTower{
 public:
@@ -15,8 +19,21 @@ public:
 	bool ClearShot(const CAttacker & attacker) const;
 	virtual void CheckRange() = 0;
 
+	char TowerType() const;
+	int TowerXpos() const;
+	int TowerYpos() const;
 
-	
+	void AddTarget(CAttacker * attacker);
+
+	bool TargetsCount() const;
+
+	void ClearTargets();
+
+	void AssignBorders(const std::vector<TBorder> & borders);
+
+
+protected:
+
 	char m_tower_type;
 	int m_ypos, m_xpos;
 	int m_range;

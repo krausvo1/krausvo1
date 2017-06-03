@@ -8,17 +8,11 @@
 #include "advancedT.h"
 #include "basicA.h"
 #include "advancedA.h"
+#include "log.h"
 
 #ifndef MAP_H
 #define MAP_H
 
-struct TLog{
-	TLog(const int & number, const int & health, const int & y, const int & x):t_number(number), t_health(health), ypos(y), xpos(x){};
-	int t_number;
-	int t_health;
-	int ypos;
-	int xpos;
-};
 
 class CMap{
 public:

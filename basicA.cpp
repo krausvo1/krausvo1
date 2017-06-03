@@ -1,11 +1,11 @@
 #include "basicA.h"
 
-CBasicAttacker::CBasicAttacker(const int & ypos, const int & xpos, const int & number, const int & health, const bool & stunned):
-							   CAttacker('&', ypos, xpos, number, health), m_stunned(stunned), m_is_escorted(false){} //LOAD
+CBasicAttacker::CBasicAttacker(const int & ypos, const int & xpos, const int & ID, const int & health, const bool & stunned):
+							   CAttacker(A_BASIC, ypos, xpos, ID, health), m_stunned(stunned), m_escorted(false){} //LOAD
 
 
-CBasicAttacker::CBasicAttacker(const CGate & start, const int & number):
-							   CAttacker('&', start, number, 150), m_stunned(false), m_is_escorted(false){} //NEW
+CBasicAttacker::CBasicAttacker(const CGate & start, const int & ID):
+							   CAttacker(A_BASIC, start, ID, 150), m_stunned(false), m_escorted(false){} //NEW
 
 
 void CBasicAttacker::TakeHit(const int & damage, const bool & stun){
@@ -16,18 +16,14 @@ void CBasicAttacker::TakeHit(const int & damage, const bool & stun){
 
 void CBasicAttacker::SetIsEscorted(const bool & escorted){
 	if(escorted)
-		m_is_escorted = true;
-// 	mvprintw(0,0,"escorted!!!!");
-// 	refresh();
-// 	usleep(1000000);
-// }
+		m_escorted = true;
 	else
-		m_is_escorted = false;
+		m_escorted = false;
 }
 
 bool CBasicAttacker::Move(){
 	if(!(m_health > 0))
-		m_attacker_type = 'X';
+		m_attacker_type = A_DEAD;
 
 	if(m_stunned){
 		init_pair(2,COLOR_YELLOW, COLOR_BLACK);
@@ -44,7 +40,7 @@ bool CBasicAttacker::Move(){
 	move(m_ypos, m_xpos);
 	addch(m_attacker_type);
 
-	if(!m_is_escorted)
+	if(!m_escorted)
 		m_moves += 2; //kolik pohybů attacker udělal
 	else
 		m_moves++;

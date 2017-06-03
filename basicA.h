@@ -1,7 +1,7 @@
 #ifndef BASICA_H
 #define BASICA_H
 #include "attacker.h"
-	
+
 	/*!
 	* Class representing a basic atacker
 	*/
@@ -12,17 +12,17 @@ public:
 	* Constructor used to initialise a basic attacker loaded from a file
 	* @param ypos vertical position of the attacker
 	* @param xpos horizontal position of the attacker
-	* @param number ID number of the attacker
+	* @param ID ID number of the attacker
 	* @param health number of health the attacker has
 	*/
-	CBasicAttacker(const int & ypos, const int & xpos, const int & number, const int & health, const bool & stunned);
+	CBasicAttacker(const int & ypos, const int & xpos, const int & ID, const int & health, const bool & stunned);
 
 	/*!
 	* Constructor used to initialise a new basic attacker
 	* @param start the gate through which the attackers enters the game
-	* @param number ID number of the attacker
+	* @param ID ID number of the attacker
 	*/
-	CBasicAttacker(const CGate & start, const int & number);
+	CBasicAttacker(const CGate & start, const int & ID);
 
 	/*!
 	* Implicit destructor
@@ -31,8 +31,8 @@ public:
 
 	/*!
 	* Decreases the amount of attackers health
-	* @param damage damage taken, based on the type of shootin tower
-	* @param stun bool value m_is_escorted variable is being set to
+	* @param damage damage taken, based on the type of shooting tower
+	* @param stun bool value m_escorted variable is being set to
 	*/
 	virtual void TakeHit(const int & damage, const bool & stun);
 
@@ -54,7 +54,7 @@ private:
 	bool m_stunned;
 
 	//! Decides whether the attacker moves directly behind an advanced attacker or not
-	bool m_is_escorted;
+	bool m_escorted;
 };
 
 #endif
