@@ -11,16 +11,16 @@ CMap::CMap(const std::vector<CTower*> & towers, const std::vector<CGate> & gates
 		   const std::vector<TBorder> & borders, const int & maxheight, const int & maxwidth, 
 		   const CGate & exit):
 		   v_towers(towers), v_gates(gates), v_borders(borders), m_attackers_alive(0), m_first_not_loaded(0), 
-		   m_maxheight(maxheight), m_maxwidth(maxwidth), m_exit_gate(exit), m_attackers_won(0), m_logs_on(true)
+		   m_maxheight(maxheight), m_maxwidth(maxwidth), m_exit_gate(exit), m_attackers_won(0), m_logs_on(true), m_money(0)
 {
 }
 
 CMap::CMap(const std::vector<CTower*> & towers, const std::vector<CGate> & gates,
 		   const std::vector<CAttacker*> & attackers, const std::vector<TBorder> & borders, 
-		   const int & maxheight, const int & maxwidth, const CGate & exit):
+		   const int & maxheight, const int & maxwidth, const CGate & exit, const int & money):
 		   v_towers(towers), v_gates(gates), v_attackers(attackers), v_borders(borders), m_attackers_alive(0), 
 		   m_first_not_loaded(attackers.size()), m_maxheight(maxheight), m_maxwidth(maxwidth), m_exit_gate(exit), 
-		   m_attackers_won(0), m_logs_on(true)
+		   m_attackers_won(0), m_logs_on(true), m_money(money)
 {
 }
 
@@ -113,8 +113,7 @@ void CMap::PrintAttackers(){
 	for(unsigned int i = 0; i < v_attackers.size(); i++){
 		if(v_attackers[i]->IsHit()){
 			if(m_logs_on)
-				v_logs.push_back(TLog(v_attackers[i]->AttackerID(), v_attackers[i]->AttackerHealth(), 
-									  v_attackers[i]->AttackerRealYpos(), v_attackers[i]->AttackerRealXpos()));
+				v_logs.push_back(TLog(v_attackers[i]->AttackerID(), v_attackers[i]->AttackerHealth()));
 			
 			v_attackers[i]->SetHit(false);
 			attron(COLOR_PAIR(1));
@@ -139,6 +138,7 @@ void CMap::PrintAttackers(){
 void CMap::CheckEscorts(CAttacker & attacker){
 	for(unsigned int i = 0; i < v_attackers.size() - 1; i++){
 		if((v_attackers[i]->AttackerType() == A_ADVANCED) && 
+		   (v_attackers[i]->m_start.path.size() - (attacker.AttackerMoves() + 2) > 0) &&
 		   (v_attackers[i]->AttackerRealYpos() == attacker.m_start.path[attacker.m_start.path.size() - (attacker.AttackerMoves() + 2)].first) &&
 		   (v_attackers[i]->AttackerRealXpos() == attacker.m_start.path[attacker.m_start.path.size() - (attacker.AttackerMoves() + 2)].second))
 		{
@@ -152,7 +152,15 @@ void CMap::CheckEscorts(CAttacker & attacker){
 
 void CMap::AddAttacker (const CGate & start){
 	move(0,0);
-	printw("Gate %d, select attacker type:\nPress B for basic attacker\nPress A for advanced attacker", start.GateID());
+
+	if(m_money == 0){
+		printw("Not enough money for more attackers! (%d$)", m_money);
+		refresh();
+		usleep(2000000);
+		return;
+	}
+
+	printw("Gate %d, select attacker type:\t\t%d$\nPress B for basic attacker (-100$)\nPress A for advanced attacker (-200$)", start.GateID(), m_money);
 	refresh();
 
 	nodelay(stdscr, false);
@@ -160,13 +168,29 @@ void CMap::AddAttacker (const CGate & start){
 	switch(getch()){
 		case 'B':
 		case 'b':
+			if(m_money < 100){
+				move(3,0);
+				printw("Not enough money for a basic attacker! (%d$)", m_money);
+				refresh();
+				usleep(2000000);
+				break;
+			}
 			v_attackers.push_back(new CBasicAttacker(start, v_attackers.size()));
 			m_attackers_alive++;
+			m_money -= 100;
 			break;
 		case 'A':
 		case 'a':
+			if(m_money < 200){
+				move(3,0);
+				printw("Not enough money for an advanced attacker! (%d)", m_money);
+				refresh();
+				usleep(2000000);
+				break;
+			}
 			v_attackers.push_back(new CAdvancedAttacker(start, v_attackers.size()));
 			m_attackers_alive++;
+			m_money -= 200;
 			break;
 		default:
 			break;
@@ -185,8 +209,8 @@ void CMap::PrintLogs(){
 		else
 			health = v_logs[i].t_health;
 
-		move(m_maxheight-1,0);
-		printw("Attacker %d hit, remaining health: %d, pos: %d,%d", v_logs[i].t_number, health, v_logs[i].ypos, v_logs[i].xpos);
+		move(m_maxheight - 1,0);
+		printw("Attacker %d hit, remaining health: %d", v_logs[i].t_number, health);
 		refresh();
 		usleep(3000000);
 	}
@@ -200,4 +224,19 @@ void CMap::SwitchLogs(){
 		m_logs_on = false;
 	else
 		m_logs_on = true;
+}
+
+int CMap::TestRound(const int & gate_number){
+	CAdvancedAttacker test(v_gates[gate_number], 0);
+
+	while(!test.CheckWin()){
+		for(unsigned int t = 0; t < v_towers.size(); t++){
+			if(v_towers[t]->InRange(test))
+				v_towers[t]->Shoot(test);
+		}
+
+		test.Move();
+	}
+
+	return 200 - test.AttackerHealth();
 }

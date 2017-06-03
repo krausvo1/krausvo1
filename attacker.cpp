@@ -29,7 +29,8 @@ void CAttacker::AssignPath(const CGate & gate){
 }
 
 bool CAttacker::CheckWin(){
-	if(m_ypos == m_start.path[0].first && m_xpos == m_start.path[0].second){
+	if((m_ypos == m_start.path[0].first && m_xpos == m_start.path[0].second)||
+	   (m_ypos == m_start.path[0].first && m_xpos == m_start.path[0].second + 1)){
 		m_attacker_won = true;
 		return true;
 	}
@@ -78,7 +79,7 @@ int CAttacker::AttackerID() const{
 	return m_attacker_ID;
 }
 
-int CAttacker::AttackerMoves() const{
+unsigned int CAttacker::AttackerMoves() const{
 	return m_moves;
 }
 

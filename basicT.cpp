@@ -4,7 +4,7 @@ CBasicTower::CBasicTower(const int & ypos, const int & xpos):
 						 CTower(T_BASIC, ypos, xpos){}
 
 void CBasicTower::Shoot(CAttacker & attacker){
-	attacker.TakeHit(20, false);
+	attacker.TakeHit(10, false);
 }
 
 bool CBasicTower::InRange(const CAttacker & attacker){

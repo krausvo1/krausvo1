@@ -99,7 +99,7 @@ public:
 
 	int AttackerID() const;
 
-	int AttackerMoves() const;
+	unsigned int AttackerMoves() const;
 
 	bool HasWon() const;
 
@@ -125,7 +125,7 @@ protected:
 	int m_health;
 	int m_attacker_ID;
 
-	int m_moves;
+	unsigned int m_moves;
 	bool m_attacker_won;
 
 	bool m_stunned;

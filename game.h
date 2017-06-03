@@ -25,11 +25,13 @@ public:
 
 	bool LoadGame(ifstream & file);
 
-	void StartGame(CMap map);
+	void StartGame(CMap & map);
 
 	void SaveGame(const CMap & map);
 
 	void RestrictArea();
+
+	void CountMoney(CMap & map);
 
 	void SetExit();
 	void SetGoal();
@@ -37,6 +39,8 @@ public:
 	void CheckResolution(const int & maxheightLoaded, const int & maxwidthLoaded);
 
 	bool CheckVictory(const int & attackers_won);
+	bool CheckGameOver(const int & money, const int & attackers_alive);
+
 	void AssignBorders();
 	bool AssignPaths();
 
@@ -94,13 +98,14 @@ private:
 
 	int m_maxheight;
 	int m_maxwidth;
-	
+
 	std::random_device m_seed;
 
 	std::mt19937 m_engine;
 
 	std::vector<std::pair<int,int>> v_restricted_area;
 
+	int m_attackers_won;
 };
 
 #endif

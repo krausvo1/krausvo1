@@ -13,7 +13,7 @@
 #include "map.h"
 #include "game.h"
 
-CGame::CGame() : m_goal(0), m_maxheight(0), m_maxwidth(0), m_engine(m_seed()){}
+CGame::CGame() : m_goal(0), m_maxheight(0), m_maxwidth(0), m_engine(m_seed()), m_attackers_won(0){}
 
 CGame::~CGame(){
 	for(unsigned int i = 0; i < v_towers.size(); i++)
@@ -33,12 +33,12 @@ void CGame::RestrictArea(){
 }
 
 void CGame::SetGoal(){
-	std::uniform_int_distribution<int> goal_range(5, 20); //jakej objekt
+	std::uniform_int_distribution<int> goal_range(5, 15); //jakej objekt
 	m_goal = goal_range(m_engine);
 }
 
 bool CGame::CheckVictory(const int & attackers_won){
-	if(attackers_won == m_goal){
+	if(attackers_won >= m_goal){
 		move((m_maxheight - 3) / 2, m_maxwidth / 2 - 6);
 		attron(A_BOLD);
 		printw("VICTORY!");
@@ -53,7 +53,43 @@ bool CGame::CheckVictory(const int & attackers_won){
 	return false;
 }
 
-void CGame::StartGame(CMap map){
+bool CGame::CheckGameOver(const int & m_money, const int & attackers_alive){
+	if(m_money == 0 && attackers_alive == 0){
+		move((m_maxheight - 3) / 2, m_maxwidth / 2 - 6);
+		attron(A_BOLD);
+		printw("GAME OVER");
+		move(((m_maxheight - 3) / 2) + 1, m_maxwidth / 2 - 6);
+		printw("Play again? [Y/N]");
+		attroff(A_BOLD); 
+		refresh();
+
+		return true;
+	}
+
+	return false;
+}
+
+void CGame::CountMoney(CMap & map){
+	int avg_damage = 0;
+
+	for(unsigned int i = 0; i < v_gates.size(); i++){
+		if(v_gates[i].GateType() == G_EXIT)
+		continue;
+
+		avg_damage += map.TestRound(i);
+	}
+
+	avg_damage = avg_damage / (v_gates.size() - 1);
+	map.m_money = (avg_damage / 200 + 2) * 1000;
+
+	if(m_goal > 8)
+		map.m_money += 1000;
+}
+
+void CGame::StartGame(CMap & map){		
+	if(map.m_money == 0)
+		CountMoney(map);
+
 	nodelay(stdscr, true);
 
 	while(1){
@@ -61,8 +97,13 @@ void CGame::StartGame(CMap map){
 		map.NextFrame();
 
 		move(m_maxheight - 2, 0);
-		printw("Attackers alive: %d, attackes won: %d, goal: %d", 
-			map.m_attackers_alive, map.m_attackers_won, m_goal);
+		printw("Attackers alive: %d, attackes won: %d, goal: %d, money: %d$", 
+			map.m_attackers_alive, map.m_attackers_won, m_goal, map.m_money);
+
+		if(map.m_attackers_won > m_attackers_won){
+			m_attackers_won = map.m_attackers_won;
+			map.m_money += 600;
+		}
 
 		if(map.m_logs_on){
 			printw(", logs: ON");
@@ -72,7 +113,7 @@ void CGame::StartGame(CMap map){
 			printw(", logs: OFF");
 
 		
-		if(CheckVictory(map.m_attackers_won)){
+		if(CheckVictory(map.m_attackers_won) || CheckGameOver(map.m_money, map.m_attackers_alive)){
 			nodelay(stdscr, false);
 			while(1){
 				switch(getch()){
@@ -102,15 +143,15 @@ void CGame::StartGame(CMap map){
 			case 'q':
 				return;
 			case '1':
-				map.AddAttacker(map.v_gates[0]);
+				map.AddAttacker(v_gates[0]);
 				continue;
 			case '2':
-				if(map.v_gates.size() > 2)
-					map.AddAttacker(map.v_gates[1]);
+				if(v_gates.size() > 2)
+					map.AddAttacker(v_gates[1]);
 				continue;
 			case '3':
-				if(map.v_gates.size() > 3)
-					map.AddAttacker(map.v_gates[2]);
+				if(v_gates.size() > 3)
+					map.AddAttacker(v_gates[2]);
 				continue;
 			case 'S':
 			case 's':
@@ -133,41 +174,41 @@ void CGame::ClearMap(){
 	}
 
 	for(int i=0; i < m_maxwidth; i++){
-		move(0,i);
+		// move(0,i);
 		m_map[0][i] = -8;
-		addch(BORDER);
+		// addch(BORDER);
 	}
 
 	for(int i=0; i < m_maxwidth; i++){
-		move(m_maxheight-3,i);
+		// move(m_maxheight-3,i);
 		m_map[m_maxheight-3][i] = -8;
-		addch(BORDER);
+		// addch(BORDER);
 	}
 
 	for(int i=0; i < m_maxheight-3; i++){
-		move(i,0);
+		// move(i,0);
 		m_map[i][0] = -8;
-		addch(BORDER);
+		// addch(BORDER);
 	}
 
 	for(int i=0; i < m_maxheight-3; i++){
-		move(i,m_maxwidth-1);
+		// move(i,m_maxwidth-1);
 		m_map[i][m_maxwidth-1] = -8;
-		addch(BORDER);
+		// addch(BORDER);
 	}
 
 	for(unsigned int i = 0; i < v_towers.size(); i++){
 		m_map[v_towers[i]->TowerYpos()][v_towers[i]->TowerXpos()] = -8;
-		move(v_towers[i]->TowerYpos(), v_towers[i]->TowerXpos());
-		addch(v_towers[i]->TowerType());
-		refresh();
+		// move(v_towers[i]->TowerYpos(), v_towers[i]->TowerXpos());
+		// addch(v_towers[i]->TowerType());
+		// refresh();
 	}
 
 	for(unsigned int i = 0; i < v_borders.size(); i++){
 		m_map[v_borders[i].t_ypos][v_borders[i].t_xpos] = -8;
-		move(v_borders[i].t_ypos, v_borders[i].t_xpos);
-		addch(BORDER);
-		refresh();
+		// move(v_borders[i].t_ypos, v_borders[i].t_xpos);
+		// addch(BORDER);
+		// refresh();
 	}
 }
 
@@ -328,7 +369,7 @@ vector<pair<int,int> > CGame::FindPath(CGate & start){
 		}
 	}
 
-	path.push_back(path[path.size()-1]);
+	// path.push_back(make_pair(y, x - 1));
 
 	return path;
 }
@@ -480,7 +521,7 @@ void CGame::GenerateGates(){
 
 	if(num_of_gates(m_engine) == 2){
 		std::uniform_int_distribution<int> first_half(1, (m_maxheight - 4) / 2);
-		std::uniform_int_distribution<int> second_half((m_maxheight - 4) / 2, m_maxheight - 4);
+		std::uniform_int_distribution<int> second_half((m_maxheight - 4) / 2 + 1, m_maxheight - 4);
 
 		CGate gate1 ('1', first_half(m_engine), m_maxwidth - 2, 1);
 		CGate gate2 ('2', second_half(m_engine), m_maxwidth - 2, 2);
@@ -494,8 +535,8 @@ void CGame::GenerateGates(){
 	}
 	else{
 		std::uniform_int_distribution<int> first_third(1, (m_maxheight - 4) / 3);
-		std::uniform_int_distribution<int> second_third((m_maxheight - 4) / 3, (m_maxheight - 4) * 2/3);
-		std::uniform_int_distribution<int> third_third((m_maxheight - 4) * 2/3, m_maxheight - 4);
+		std::uniform_int_distribution<int> second_third((m_maxheight - 4) / 3 + 1, (m_maxheight - 4) * 2/3);
+		std::uniform_int_distribution<int> third_third((m_maxheight - 4) * 2/3 + 1, m_maxheight - 4);
 
 		CGate gate1 ('1', first_third(m_engine), m_maxwidth - 2, 1);
 		CGate gate2 ('2', second_third(m_engine), m_maxwidth - 2, 2);
@@ -514,7 +555,6 @@ void CGame::GenerateGates(){
 void CGame::NewGame(){
 	getmaxyx(stdscr, m_maxheight, m_maxwidth);
 
-	clear();
 	v_towers.clear();
 	v_attackers.clear();
 	v_gates.clear();
@@ -546,7 +586,8 @@ bool CGame::LoadGame(ifstream & file){
 	getmaxyx(stdscr, m_maxheight, m_maxwidth);
 
 	int maxheightLoaded, maxwidthLoaded;
-	if(!(file >> maxheightLoaded >> maxwidthLoaded >> m_goal)){
+	int money = 0;
+	if(!(file >> maxheightLoaded >> maxwidthLoaded >> m_goal >> money)){
 		printw("Header of the file is invalid, please check the first line.");
 		refresh();
 		usleep(2000000);
@@ -560,7 +601,7 @@ bool CGame::LoadGame(ifstream & file){
 
 	char object, type;
 	int ypos, xpos;
-	int health = 0, stunned = false;
+	int health = 0, stunned = 0;
 	int line_number = 1;
 	while(file >> object >> type >> ypos >> xpos){
 		if(object == 'A' && !(file >> health >> stunned)){
@@ -599,7 +640,7 @@ bool CGame::LoadGame(ifstream & file){
 	usleep(190000);
 	clear();
 
-	CMap map(v_towers, v_gates, v_attackers, v_borders, m_maxheight, m_maxwidth, m_exit_gate);
+	CMap map(v_towers, v_gates, v_attackers, v_borders, m_maxheight, m_maxwidth, m_exit_gate, money);
 	
 	StartGame(map);
 
@@ -744,7 +785,7 @@ void CGame::SaveGame(const CMap & map){
 	nodelay(stdscr, true);
 	clear();
 
-	outputFile << m_maxheight << " " << m_maxwidth << " " << m_goal << '\n';
+	outputFile << m_maxheight << " " << m_maxwidth << " " << m_goal << " " << map.m_money << '\n';
 
 
 	for(unsigned int i = 0; i < v_gates.size(); i++){
@@ -775,13 +816,13 @@ void CGame::SaveGame(const CMap & map){
 }
 
 void CGame::CheckGoal(){
-	if(m_goal > 20 || m_goal < 5){
+	if(m_goal > 15 || m_goal < 5){
 		clear();
-		printw("Goal out of interval <5,20>, setting it to 20.");
+		printw("Goal out of interval <5,15>, setting it to 15.");
 		refresh();
 		usleep(2000000);
 
-		m_goal = 20;
+		m_goal = 15;
 	}
 }
 

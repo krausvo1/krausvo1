@@ -21,11 +21,13 @@ public:
 	
 	CMap(const std::vector<CTower*> & towers, const std::vector<CGate> & gates,
 		 const std::vector<CAttacker*> & attackers, const std::vector<TBorder> & borders, const int & maxheight, const int & maxwidth,
-		 const CGate & exit);
+		 const CGate & exit, const int & money);
 
 	~CMap();
 
 	std::vector<std::pair<int,int>> FindPath(CGate & start);
+
+	int TestRound(const int & gate_number);
 
 	void NextFrame();
 
@@ -42,6 +44,7 @@ public:
 	void SwitchLogs();
 
 	void AddAttacker (const CGate & gate);
+
 
 
 	std::vector<CTower*> v_towers;
@@ -63,6 +66,7 @@ public:
 	int m_attackers_won;
 	bool m_logs_on;
 
+	int m_money;
 };
 
 
