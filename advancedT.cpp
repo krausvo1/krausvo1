@@ -1,6 +1,4 @@
 #include "advancedT.h"
-#include <unistd.h>
-#include <cmath>
 
 CAdvancedTower::CAdvancedTower(const int & ypos, const int & xpos):
 					    	   CTower(T_ADVANCED, ypos, xpos), m_stun_ready(true), m_use_stun(false){}

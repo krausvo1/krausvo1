@@ -42,6 +42,7 @@ public:
 	*/
 	virtual bool Move();
 
+
 private:
 
 	//! Decides whether this attacker is going to be stunned for a round or not

@@ -2,6 +2,10 @@
 #define GATE_H
 
 #include <vector>
+#include <iostream>
+#include <cstdlib>
+#include <curses.h>
+
 
 #define G_EXIT '<'
 	/*!

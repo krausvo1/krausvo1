@@ -1,35 +1,41 @@
 #include "map.h"
-#include <iostream>
-#include <cstdlib>
-#include <curses.h>
-#include <vector>
-#include <unistd.h>
 
-using namespace std;
+CMap::CMap(const std::vector<CTower*> & towers, 
+		   const std::vector<CGate> & gates, 
+		   const std::vector<TBorder> & borders, 
+		   const unsigned int & maxheight,
+		   const unsigned int & maxwidth, 
+		   const CGate & exit) :
 
-CMap::CMap(const std::vector<CTower*> & towers, const std::vector<CGate> & gates, 
-		   const std::vector<TBorder> & borders, const int & maxheight, const int & maxwidth, 
-		   const CGate & exit):
 		   v_towers(towers), v_gates(gates), v_borders(borders), m_attackers_alive(0), m_first_not_loaded(0), 
 		   m_maxheight(maxheight), m_maxwidth(maxwidth), m_exit_gate(exit), m_attackers_won(0), m_logs_on(true), m_money(0)
 {
 }
 
-CMap::CMap(const std::vector<CAttacker*> & attackers, const std::vector<CTower*> & towers, const std::vector<CGate> & gates,
-		   const std::vector<TBorder> & borders, const int & maxheight, const int & maxwidth, const CGate & exit, 
-		   const int & attackers_won, const int & money):
+CMap::CMap(const std::vector<CAttacker*> & attackers, 
+		   const std::vector<CTower*> & towers, 
+		   const std::vector<CGate> & gates,
+		   const std::vector<TBorder> & borders, 
+		   const unsigned int & maxheight, 
+		   const unsigned int & maxwidth, 
+		   const CGate & exit, 
+		   const int & attackers_won, 
+		   const int & money) :
+
 		   v_attackers(attackers), v_towers(towers), v_gates(gates), v_borders(borders), m_attackers_alive(0), 
 		   m_first_not_loaded(attackers.size()), m_maxheight(maxheight), m_maxwidth(maxwidth), m_exit_gate(exit), 
 		   m_attackers_won(attackers_won), m_logs_on(true), m_money(money)
 {
 }
 
-CMap::~CMap(){
+CMap::~CMap()
+{
 	for(unsigned int i = m_first_not_loaded; i < v_attackers.size(); i++)
           delete v_attackers[i];  
 }
 
-void CMap::NextFrame (){
+void CMap::NextFrame()
+{
 	PrintBorders();
 	PrintTowers();
 	PrintGates();
@@ -37,59 +43,60 @@ void CMap::NextFrame (){
 	PrintAttackers();
 }
 
-void CMap::PrintBorders() const{
-	for(int i=0; i < m_maxwidth; i++){
-		move(0,i);
-		// if(choice != 'f')
-		// 	map[0][i] = BORDER;
+void CMap::PrintBorders() const
+{
+	//Place borders:
+	//from top left corner to top right corner
+	for(unsigned int i = 0; i < m_maxwidth; i++){
+		move(0, i);
 		addch(BORDER);
 	}
 
-	for(int i=0; i < m_maxwidth; i++){
-		move(m_maxheight-3,i);
-		// if(choice != 'f')
-		// 	map[m_maxheight-3][i] = BORDER;
+	//from bottom left corner to bottom right corner
+	for(unsigned int i = 0; i < m_maxwidth; i++){
+		move(m_maxheight - 3, i);
 		addch(BORDER);
 	}
 
-	for(int i=0; i < m_maxheight-3; i++){
-		move(i,0);
-		// if(choice != 'f')
-		// 	map[i][0] = BORDER;
+	//from bottom left corner to top left corner
+	for(unsigned int i = 0; i < m_maxheight - 3; i++){
+		move(i, 0);
 		addch(BORDER);
 	}
 
-	for(int i=0; i < m_maxheight-3; i++){
-		move(i,m_maxwidth-1);
-		// if(choice != 'f')
-		// 	map[i][m_maxwidth-1] = BORDER;
+	//from top right corner to bottom right corner
+	for(unsigned int i = 0; i < m_maxheight - 3; i++){
+		move(i, m_maxwidth - 1);
 		addch(BORDER);
 	}
 
+	//place generated borders
 	for(unsigned int i = 0; i < v_borders.size(); i++){
-		move(v_borders[i].t_ypos,v_borders[i].t_xpos);
-		// if(choice != 'f')
-		// 	map[v_borders[i].t_ypos][v_borders[i].t_xpos] = BORDER;
+		move(v_borders[i].t_ypos, v_borders[i].t_xpos);
 		addch(BORDER);
 	}
 }
 
-void CMap::PrintTowers() const{
+void CMap::PrintTowers() const
+{
 	for(unsigned int i = 0; i < v_towers.size(); i++){
 		move(v_towers[i]->TowerYpos(), v_towers[i]->TowerXpos());
 		addch(v_towers[i]->TowerType());
 	}
 }
 
-void CMap::PrintGates() const{
+void CMap::PrintGates() const
+{
 	for(unsigned int i = 0; i < v_gates.size(); i++){
 		move(v_gates[i].GateYpos(), v_gates[i].GateXpos());
 		addch(v_gates[i].GateType());
 	}
 }
 
-void CMap::CheckCollisions(){
-	for(unsigned int t = 0; t < v_towers.size(); t++){
+void CMap::CheckCollisions()
+{
+	for(unsigned int t = 0; t < v_towers.size(); t++)
+	{
 		for(unsigned int a = 0; a < v_attackers.size(); a++)
 			if(v_attackers[a]->IsInGame() && v_towers[t]->InRange(*v_attackers[a]))
 				v_towers[t]->AddTarget(v_attackers[a]);
@@ -104,14 +111,17 @@ void CMap::CheckCollisions(){
 	}
 }
 
-void CMap::PrintAttackers(){
+void CMap::PrintAttackers()
+{
 	start_color();
-	init_pair(1,COLOR_RED, COLOR_BLACK);
+	init_pair(1, COLOR_RED, COLOR_BLACK);
 	
 	m_attackers_alive = 0;
 	
-	for(unsigned int i = 0; i < v_attackers.size(); i++){
-		if(v_attackers[i]->IsHit()){
+	for(unsigned int i = 0; i < v_attackers.size(); i++)
+	{
+		if(v_attackers[i]->IsHit())
+		{
 			if(m_logs_on)
 				v_logs.push_back(TLog(v_attackers[i]->AttackerID(), v_attackers[i]->AttackerHealth()));
 			
@@ -121,10 +131,10 @@ void CMap::PrintAttackers(){
 
 		CheckPriorities(*v_attackers[i]);
 
-		if(!v_attackers[i]->HasWon() && v_attackers[i]->AttackerType() != A_DEAD && v_attackers[i]->Move()){
-			if(v_attackers[i]->CheckWin()){
+		if(!v_attackers[i]->HasWon() && v_attackers[i]->AttackerType() != A_DEAD && v_attackers[i]->Move())
+		{
+			if(v_attackers[i]->CheckWin())
 				m_attackers_won++;
-			}
 			else
 				m_attackers_alive++;
 
@@ -134,15 +144,20 @@ void CMap::PrintAttackers(){
 	}
 }
 
-void CMap::CheckPriorities(CAttacker & attacker){
+void CMap::CheckPriorities(CAttacker & attacker)
+{
 	int difference;
+
 	if(attacker.AttackerType() == A_ADVANCED)
 		difference = 1;
 	else
 		difference = 2;
 
-	for(unsigned int i = 0; i < v_attackers.size() - 1; i++){
-		if((v_attackers[i]->m_start.path.size() - (attacker.AttackerMoves() + 2) > 0) && (v_attackers[i]->IsInGame()) &&
+
+	for(unsigned int i = 0; i < v_attackers.size() - 1; i++)
+	{
+		if((v_attackers[i]->m_start.path.size() - (attacker.AttackerMoves() + difference) > 0) && 
+		   (v_attackers[i]->IsInGame()) &&
 		   (v_attackers[i]->AttackerRealYpos() == attacker.m_start.path[attacker.m_start.path.size() - (attacker.AttackerMoves() + difference)].first) &&
 		   (v_attackers[i]->AttackerRealXpos() == attacker.m_start.path[attacker.m_start.path.size() - (attacker.AttackerMoves() + difference)].second))
 		{
@@ -154,7 +169,8 @@ void CMap::CheckPriorities(CAttacker & attacker){
 	}
 }
 
-void CMap::AddAttacker (const CGate & start){
+void CMap::AddAttacker(const CGate & start)
+{
 	move(0,0);
 
 	if(m_money == 0){
@@ -169,7 +185,9 @@ void CMap::AddAttacker (const CGate & start){
 
 	nodelay(stdscr, false);
 
-	switch(getch()){
+	switch(getch())
+	{
+		//BASIC ATTACKER
 		case 'B':
 		case 'b':
 			if(m_money < 100){
@@ -179,10 +197,13 @@ void CMap::AddAttacker (const CGate & start){
 				usleep(2000000);
 				break;
 			}
+
 			v_attackers.push_back(new CBasicAttacker(start, v_attackers.size()));
 			m_attackers_alive++;
 			m_money -= 100;
 			break;
+
+		//ADVANCED ATTACKER
 		case 'A':
 		case 'a':
 			if(m_money < 200){
@@ -192,10 +213,12 @@ void CMap::AddAttacker (const CGate & start){
 				usleep(2000000);
 				break;
 			}
+
 			v_attackers.push_back(new CAdvancedAttacker(start, v_attackers.size()));
 			m_attackers_alive++;
 			m_money -= 200;
 			break;
+		
 		default:
 			break;
 	}
@@ -204,11 +227,13 @@ void CMap::AddAttacker (const CGate & start){
 	clear();
 }
 
-void CMap::PrintLogs(){
+void CMap::PrintLogs()
+{
 	int health;
 
-	for(unsigned int i = 0; i < v_logs.size(); i++){
-		if(!(v_logs[i].t_health > 0))
+	for(unsigned int i = 0; i < v_logs.size(); i++)
+	{
+		if(v_logs[i].t_health <= 0)
 			health = 0;
 		else
 			health = v_logs[i].t_health;
@@ -223,18 +248,22 @@ void CMap::PrintLogs(){
 }
 
 
-void CMap::SwitchLogs(){
+void CMap::SwitchLogs()
+{
 	if(m_logs_on)
 		m_logs_on = false;
 	else
 		m_logs_on = true;
 }
 
-int CMap::TestRound(const int & gate_number){
+int CMap::TestRound(const int & gate_number)
+{
 	CAdvancedAttacker test(v_gates[gate_number], 0);
 
-	while(!test.CheckWin()){
-		for(unsigned int t = 0; t < v_towers.size(); t++){
+	while(!test.CheckWin())
+	{
+		for(unsigned int t = 0; t < v_towers.size(); t++)
+		{
 			if(v_towers[t]->InRange(test))
 				v_towers[t]->Shoot(test);
 		}
@@ -242,29 +271,37 @@ int CMap::TestRound(const int & gate_number){
 		test.Move();
 	}
 
+	clear();
+
 	return 200 - test.AttackerHealth();
 }
 
-int CMap::AttackersWon() const{
+int CMap::AttackersWon() const
+{
 	return m_attackers_won;
 }
 
-int CMap::AttackersAlive() const{
+int CMap::AttackersAlive() const
+{
 	return m_attackers_alive;
 }
 
-int CMap::Money() const{
+int CMap::Money() const
+{
 	return m_money;
 }
 
-void CMap::AddMoney(const int & money){
+void CMap::AddMoney(const int & money)
+{
 	m_money += money;
 }
 
-void CMap::SetMoney(const int & money){
+void CMap::SetMoney(const int & money)
+{
 	m_money = money;
 }
 
-bool CMap::LogsON() const{
+bool CMap::LogsON() const
+{
 	return m_logs_on;
 }

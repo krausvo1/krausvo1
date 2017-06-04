@@ -1,18 +1,4 @@
-#include <curses.h>
-#include <iostream>
-#include <cstdlib>
 #include "menu.h"
-#include <unistd.h>
-#include <string>
-#include <cstring>
-#include <fstream>
-#include <vector>
-#include <curses.h>
-#include "tower.h"
-#include "gate.h"
-#include "attacker.h"
-
-using namespace std;
 
 CMenu::CMenu(){
 	initscr();

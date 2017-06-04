@@ -1,7 +1,7 @@
 #ifndef BASICT_H
 #define BASICT_H
+
 #include "tower.h"
-#include "attacker.h"
 
 
 class CBasicTower : public CTower{

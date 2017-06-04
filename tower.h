@@ -1,6 +1,6 @@
 #ifndef TOWER_H
 #define TOWER_H
-#include <vector>
+
 #include "attacker.h"
 #include "border.h"
 

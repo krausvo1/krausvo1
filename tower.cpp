@@ -1,9 +1,4 @@
 #include "tower.h"
-#include <iostream>
-#include <cstdlib>
-#include <curses.h>
-#include <vector>
-#include <unistd.h>
 
 CTower::CTower(const char & type, const int & ypos, const int & xpos):
 		   	   m_tower_type(type), m_ypos(ypos), m_xpos(xpos), m_range(2){}

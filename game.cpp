@@ -1,29 +1,19 @@
-#include <curses.h>
-#include <ctime>
-#include <iostream>
-#include <cstdlib>
-#include <unistd.h>
-#include <string>
-#include <cstring>
-#include <fstream>
-#include <vector>
-#include "tower.h"
-#include "gate.h"
-#include "attacker.h"
-#include "map.h"
 #include "game.h"
 
-CGame::CGame() : m_goal(0), m_maxheight(0), m_maxwidth(0), m_engine(m_seed()), m_attackers_won(0){}
+CGame::CGame() : m_goal(0), m_maxheight(0), m_maxwidth(0), m_engine(m_seed()), m_attackers_won(0)
+{}
 
-CGame::~CGame(){
+CGame::~CGame()
+{
 	for(unsigned int i = 0; i < v_towers.size(); i++)
-          delete v_towers[i];
+      delete v_towers[i];
 
-   for(unsigned int i = 0; i < v_attackers.size(); i++)
+   	for(unsigned int i = 0; i < v_attackers.size(); i++)
       delete v_attackers[i];
 }
 
-void CGame::RestrictArea(){
+void CGame::RestrictArea()
+{
 	for(int i = m_maxwidth - 5; i < m_maxwidth - 2; i++)
 		for(int j = 0; j < m_maxheight - 3; j++)
 			v_restricted_area.push_back(make_pair(j,i));
@@ -32,17 +22,20 @@ void CGame::RestrictArea(){
 		v_restricted_area.push_back(make_pair(j,1));
 }
 
-void CGame::SetGoal(){
-	std::uniform_int_distribution<int> goal_range(5, 15); //jakej objekt
+void CGame::SetGoal()
+{
+	std::uniform_int_distribution<int> goal_range(5, 15);
+
 	m_goal = goal_range(m_engine);
 }
 
-bool CGame::CheckVictory(const int & attackers_won){
+bool CGame::CheckVictory(const int & attackers_won)
+{
 	if(attackers_won >= m_goal){
-		move((m_maxheight - 3) / 2, m_maxwidth / 2 - 6);
+		move( (m_maxheight - 3) / 2, m_maxwidth / 2 - 8);
 		attron(A_BOLD);
 		printw("VICTORY!");
-		move(((m_maxheight - 3) / 2) + 1, m_maxwidth / 2 - 6);
+		move( ((m_maxheight - 3) / 2) + 1, m_maxwidth / 2 - 8);
 		printw("Play again? [Y/N]");
 		attroff(A_BOLD); 
 		refresh();
@@ -53,12 +46,15 @@ bool CGame::CheckVictory(const int & attackers_won){
 	return false;
 }
 
-bool CGame::CheckGameOver(const int & m_money, const int & attackers_alive){
-	if(m_money == 0 && attackers_alive == 0){
-		move((m_maxheight - 3) / 2, m_maxwidth / 2 - 6);
+bool CGame::CheckGameOver(const int & m_money, 
+						  const int & attackers_alive)
+{
+	if(m_money == 0 && attackers_alive == 0)
+	{
+		move( (m_maxheight - 3) / 2, m_maxwidth / 2 - 8);
 		attron(A_BOLD);
 		printw("GAME OVER");
-		move(((m_maxheight - 3) / 2) + 1, m_maxwidth / 2 - 6);
+		move( ((m_maxheight - 3) / 2) + 1, m_maxwidth / 2 - 8);
 		printw("Play again? [Y/N]");
 		attroff(A_BOLD); 
 		refresh();
@@ -69,12 +65,14 @@ bool CGame::CheckGameOver(const int & m_money, const int & attackers_alive){
 	return false;
 }
 
-void CGame::CountMoney(CMap & map){
+void CGame::CountMoney(CMap & map)
+{
 	int avg_damage = 0;
 
-	for(unsigned int i = 0; i < v_gates.size(); i++){
+	for(unsigned int i = 0; i < v_gates.size(); i++)
+	{
 		if(v_gates[i].GateType() == G_EXIT)
-		continue;
+			continue;
 
 		avg_damage += map.TestRound(i);
 	}
@@ -86,7 +84,8 @@ void CGame::CountMoney(CMap & map){
 		map.AddMoney(1000);
 }
 
-void CGame::StartGame(CMap & map){		
+void CGame::StartGame(CMap & map)
+{		
 	if(map.Money() == 0)
 		CountMoney(map);
 
@@ -113,17 +112,24 @@ void CGame::StartGame(CMap & map){
 			printw(", logs: OFF");
 
 		
-		if(CheckVictory(map.AttackersWon()) || CheckGameOver(map.Money(), map.AttackersAlive())){
+		if(CheckVictory(map.AttackersWon()) || CheckGameOver(map.Money(), map.AttackersAlive()))
+		{
 			nodelay(stdscr, false);
-			while(1){
-				switch(getch()){
+			while(1)
+			{
+				switch(getch())
+				{	
+					//PLAY AGAIN
 					case 'Y':
 					case 'y':
 						NewGame();
 						return;
+
+					//QUIT GAME
 					case 'N':
 					case 'n':
 						return;
+
 					default:
 						continue;
 				};
@@ -134,24 +140,36 @@ void CGame::StartGame(CMap & map){
 		clear();
 		usleep(300000);
 		
-		switch(getch()){
+		switch(getch())
+		{
+			//TURN LOGS ON/OFF
 			case 'L':
 			case 'l':
 				map.SwitchLogs();
 				continue;
+
+			//QUIT GAME
 			case 'Q':
 			case 'q':
 				return;
+
+			//ADD AN ATTACKER TO GATE NUMBER 1
 			case '1':
 				map.AddAttacker(v_gates[0]);
 				continue;
+
+			//ADD AN ATTACKER TO GATE NUMBER 2
 			case '2':
 				map.AddAttacker(v_gates[1]);
 				continue;
+
+			//ADD AN ATTACKER TO GATE NUMBER 3
 			case '3':
 				if(v_gates.size() > 3)
 					map.AddAttacker(v_gates[2]);
 				continue;
+
+			//SAVE GAME
 			case 'S':
 			case 's':
 				SaveGame(map);
@@ -160,293 +178,234 @@ void CGame::StartGame(CMap & map){
 	}	
 }
 
-void CGame::ClearMap(){
+void CGame::ClearMap()
+{
 	m_map.resize(m_maxheight);
-	for(int i = 0; i < m_maxheight; i++){
+	for(unsigned int i = 0; i < m_maxheight; i++)
 		m_map[i].resize(m_maxwidth);
-	}
 
-	for(unsigned int i = 0; i < v_gates.size(); i++){
-		for(int i = 0; i < m_maxheight; i++)
-			for(int j = 0; j < m_maxwidth; j++)
-				m_map[i][j] = 0;
-	}
 
-	for(int i=0; i < m_maxwidth; i++){
-		// move(0,i);
+	for(unsigned int i = 0; i < m_maxheight; i++)
+		for(unsigned int j = 0; j < m_maxwidth; j++)
+			m_map[i][j] = 0;
+
+	//Place borders:
+	//from top left corner to top right corner
+	for(unsigned int i = 0; i < m_maxwidth; i++)
 		m_map[0][i] = -8;
-		// addch(BORDER);
-	}
 
-	for(int i=0; i < m_maxwidth; i++){
-		// move(m_maxheight-3,i);
-		m_map[m_maxheight-3][i] = -8;
-		// addch(BORDER);
-	}
+	//from bottom left corner to bottom right corner
+	for(unsigned int i = 0; i < m_maxwidth; i++)
+		m_map[m_maxheight - 3][i] = -8;
 
-	for(int i=0; i < m_maxheight-3; i++){
-		// move(i,0);
+	//from bottom left corner to top left corner
+	for(unsigned int i = 0; i < m_maxheight - 3; i++)
 		m_map[i][0] = -8;
-		// addch(BORDER);
-	}
 
-	for(int i=0; i < m_maxheight-3; i++){
-		// move(i,m_maxwidth-1);
-		m_map[i][m_maxwidth-1] = -8;
-		// addch(BORDER);
-	}
-
-	for(unsigned int i = 0; i < v_towers.size(); i++){
-		m_map[v_towers[i]->TowerYpos()][v_towers[i]->TowerXpos()] = -8;
-		// move(v_towers[i]->TowerYpos(), v_towers[i]->TowerXpos());
-		// addch(v_towers[i]->TowerType());
-		// refresh();
-	}
-
-	for(unsigned int i = 0; i < v_borders.size(); i++){
+	//from top right corner to bottom right corner
+	for(unsigned int i = 0; i < m_maxheight - 3; i++)
+		m_map[i][m_maxwidth - 1] = -8;
+	
+	//place generated borders
+	for(unsigned int i = 0; i < v_borders.size(); i++)
 		m_map[v_borders[i].t_ypos][v_borders[i].t_xpos] = -8;
-		// move(v_borders[i].t_ypos, v_borders[i].t_xpos);
-		// addch(BORDER);
-		// refresh();
-	}
+	
+	//place towers
+	for(unsigned int i = 0; i < v_towers.size(); i++)
+		m_map[v_towers[i]->TowerYpos()][v_towers[i]->TowerXpos()] = -8;
+
 }
 
-vector<pair<int,int> > CGame::FindPath(CGate & start){
-	std::vector<pair<int, int> > temp; //uchovává souřadnice
-	// clear();
+std::vector< std::pair<int,int> > CGame::FindPath(CGate & start)
+{
+	//stores coordinates of nodes
+	std::vector< std::pair<int, int> > nodes;
+
 	int y = start.GateYpos();
 	int x = start.GateXpos();
 
-	// mvprintw(0,0,"START: %d,%d vs. max: %d, %d", y, x, m_maxheight, m_maxwidth);
-	// refresh();
-	// usleep(2000000);
-
-	temp.push_back(make_pair(y,x));
-	// clear();
-	// move(y,x);
-	// addch('S');
-	// move(m_exit_gate.m_ypos,m_exit_gate.m_xpos);
-	// addch('E');
-	// refresh();
-	// usleep(100000);
-
-	// printw("start pos: %d,%d", y,x);
-	// printw("\nend pos: %d,%d", m_exit_gate.m_ypos,m_exit_gate.m_xpos);
-	// refresh();
-	// usleep(1000000);
-
-	//očísluj
-	while(temp[0].first != m_exit_gate.GateYpos() || temp[0].second != m_exit_gate.GateXpos()){ 
-
-		if(y != 0 && m_map[y - 1][x] == 0){//y != 0 kvůli pozici -1
-			temp.push_back(make_pair(y - 1, x));
+	nodes.push_back(make_pair(y,x));
+	
+	//count the cost of every node
+	while(nodes[0].first != m_exit_gate.GateYpos() || nodes[0].second != m_exit_gate.GateXpos())
+	{
+		if(y != 0 && m_map[y - 1][x] == 0){
+			nodes.push_back(make_pair(y - 1, x));
 			m_map[y - 1][x] = m_map[y][x] + 1;
-			// move(y-1,x);
-			// addch(m_map[y-1][x]);
-			// refresh();
-			// usleep(1900);
 		}
 		
-		if(x != 0 && m_map[y][x - 1] == 0){//x != 0 kvůli pozici -1
-			temp.push_back(make_pair(y, x - 1));
+		if(x != 0 && m_map[y][x - 1] == 0){
+			nodes.push_back(make_pair(y, x - 1));
 			m_map[y][x - 1] = m_map[y][x] + 1;
-			// move(y,x-1);
-			// addch(m_map[y][x-1]);
-			// refresh();
-			// usleep(1900);
 		}
 
 		if(y != m_maxheight - 4 && m_map[y + 1][x] == 0){
-			temp.push_back(make_pair(y + 1, x));
+			nodes.push_back(make_pair(y + 1, x));
 			m_map[y + 1][x] = m_map[y][x] + 1;
-			// move(y+1,x);
-			// addch(m_map[y+1][x]);
-			// refresh();
-			// usleep(1900);
 		}
 
 		if(x != m_maxwidth - 1 && m_map[y][x + 1] == 0){
-			temp.push_back(make_pair(y, x + 1));
+			nodes.push_back(make_pair(y, x + 1));
 			m_map[y][x + 1] = m_map[y][x] + 1;
-			// move(y,x+1);
-			// addch(m_map[y][x+1]);
-			// refresh();
-			// usleep(1900);
 		}
 
-		if(!temp.empty())
-			temp.erase(temp.begin());
+		if(!nodes.empty())
+			nodes.erase(nodes.begin());
 
-		y = temp[0].first;
-		x = temp[0].second;
-		// clear();
-		// mvprintw(0,0,"PRVNI, %dvs%d, %dvs%d", temp[0].first,m_exit_gate.m_ypos, temp[0].second,m_exit_gate.m_xpos);
-		// refresh();
-		// usleep(190000);
+		y = nodes[0].first;
+		x = nodes[0].second;
 	}
 
 	m_map[start.GateYpos()][start.GateXpos()] = 0;
 
 	 
-	//najdi cestu zpět, z cíle do počátku, path[0] = cíl, path[max] = počátek
-	vector<pair<int,int> > path;
+
+	//stores coordinates representing the way form entry gate to exit gate
+	std::vector< std::pair<int,int> > path;
 
 	y = m_exit_gate.GateYpos();
 	x = m_exit_gate.GateXpos();
 	
 	path.push_back(make_pair(y, x));
-	// clear();
-	// printw("POnd pos: %d,%d", y,x);
-	// refresh();
-	// usleep(1000000);
 	
-	int i = 0;
 
-	// for(int i = 0; i < m_m_maxheight-4; i++)
-	// 	for(int j = 0; j < m_maxwidth; j++){
-	// 		mvprintw(i,j,"%c",map[i][j]);
-	// 		refresh();
-	// 	}
+	int round = 0;
 
-	// usleep(190000);
-	// clear();
-	// refresh();
-	int round;
-	while((path[path.size() - 1].first != start.GateYpos() || path[path.size() - 1].second != start.GateXpos())){ 
+	//find the way with the lowest nodes values
+	while((path[path.size() - 1].first != start.GateYpos() || path[path.size() - 1].second != start.GateXpos()))
+	{	
 		if(path.size() > 1){
-			i++;
-			// y = path[path.size() - 1].first;
-			// x = path[path.size() - 1].second;
 			y = path[path.size() - 1].first;
 			x = path[path.size() - 1].second;
-			// mvprintw(0,0,"%d,%d",y,x);
-			// refresh();
-			// usleep(10000);
-
 		}
 
 		if(y != 0 && m_map[y - 1][x] == m_map[y][x] - 1){
 			path.push_back(make_pair(y - 1, x));
-			// move(y-1,x);
-			// addch(m_map[y-1][x]);
-			// refresh();
-			// usleep(10000);
 			continue;
 		}
 
 		if(x != 0 && m_map[y][x - 1] == m_map[y][x] - 1){
 			path.push_back(make_pair(y, x - 1));
-			// move(y,x-1);
-			// addch(m_map[y][x-1]);
-			// refresh();
-			// usleep(10000);
 			continue;
 		}
 
 		if(y != m_maxheight - 4 && m_map[y + 1][x] == m_map[y][x] - 1){
 			path.push_back(make_pair(y + 1, x));
-			// move(y+1,x);
-			// addch(m_map[y+1][x]);
-			// refresh();
-			// usleep(10000);
 			continue;
 		}
 		
 		if(x != m_maxwidth - 1 && m_map[y][x + 1] == m_map[y][x] - 1){
 			path.push_back(make_pair(y, x + 1));
-			// move(y,x+1);
-			// addch(m_map[y][x+1]);
-			// refresh();
-			// usleep(10000);
 			continue;
 		}
 
+		
 		round++;
+		//in case this while loop 
 		if(round > 100000){
-			vector<pair<int,int>> error;
+			std::vector< std::pair<int,int> > error;
 			return error;
 		}
 	}
 
-	// path.push_back(make_pair(y, x - 1));
-
 	return path;
 }
 
-void CGame::GenerateMap(){
-	std::uniform_int_distribution<int> place_range(7, 10); //n-tá souřadnice
+void CGame::GenerateMap()
+{
+	std::uniform_int_distribution<int> placement_range(7, 10);
 
-	for(int choice = 2; choice > 0; choice--){
-		for(unsigned int i = 0; i < v_gates.size() - 1; i++){
+	//choose which object (1 - wall, 2 - tower) eliminate
+	for(int choice = 2; choice > 0; choice--)
+	{
+		for(unsigned int i = 0; i < v_gates.size() - 1; i++)
+		{
 			ClearMap();
 			v_gates[i].path = FindPath(v_gates[i]);
 
-			for(int rnd_pos = v_gates[i].path.size() - 4; rnd_pos > 3; rnd_pos -= place_range(m_engine)){
+			//choose a coordinate from the path, place an obstacle somewhere in its area
+			//and find new shortest path
+			for(int rnd_pos = v_gates[i].path.size() - 4; rnd_pos > 3; rnd_pos -= placement_range(m_engine))
+			{
 				if(rnd_pos < 3)
 					break;
 
 				ClearMap();
 				
-				while(v_gates[i].path.size() == 0){ 
-					v_gates[i].path = FindPath(v_gates[i]);///////////////////////////
+				//in case a path cannot be found, destroy the last inserted border
+				while(v_gates[i].path.size() == 0)
+				{
+					v_gates[i].path = FindPath(v_gates[i]);
 					v_borders.pop_back();
 				}
 
 				PlaceObstacle(v_gates[i].path[rnd_pos], v_gates[i].path[rnd_pos - 1], 
-							  v_gates[i].path[rnd_pos - 2], choice); //na jakou souřadnici
+							  v_gates[i].path[rnd_pos - 2], choice);
 			}
 		}
 	}
 
-	for(unsigned int i = 0; i < v_gates.size() - 1; i++){
+	//find the shortest paths with all obstacles in place
+	for(unsigned int i = 0; i < v_gates.size() - 1; i++)
+	{
 		ClearMap();
 		v_gates[i].path = FindPath(v_gates[i]);
 		
-		while(v_gates[i].path.size() == 0){
-			v_gates[i].path = FindPath(v_gates[i]);//////////////////////////////////
+		//in case a path cannot be found, destroy the last inserted border
+		while(v_gates[i].path.size() == 0)
+		{
+			v_gates[i].path = FindPath(v_gates[i]);
 			v_borders.pop_back();
 		}
 	}
 }
 
+
 void CGame::PlaceObstacle(std::pair<int,int> position1, 
 						  std::pair<int,int> position2, 
-						  std::pair<int,int> position3, const int & eliminate){
-
+						  std::pair<int,int> position3, 
+						  const int & eliminate)
+{
 	for(unsigned int i = 0; i < v_restricted_area.size(); i++)
 		if(position1 == v_restricted_area[i] ||
 		   position2 == v_restricted_area[i] ||
 		   position3 == v_restricted_area[i]  ) return;
 	
-	std::uniform_int_distribution<int> dist(1, 2); //jakej objekt
+	std::uniform_int_distribution<int> dist(1, 2);
 
 	if(position1.second < 2)
 		position1.second = 2;
 
-	move(0,0);
+
 	int choice = dist(m_engine);
 
-	if(choice == eliminate) //VÍC POKUSŮ
+	//second chance to choose an object
+	if(choice == eliminate)
 		choice = dist(m_engine);
 
 	if(choice != eliminate)
 		switch(choice){
-			case 1://WALL
+			// WALL
+			case 1:
 				GenerateWall(position1);
 				break;
-			case 2:// T
+			
+			// TOWER
+			case 2:
 				GenerateTower(position1, position2, position3, dist(m_engine));
-	}
+		}
 }
 
-void CGame::GenerateWall(std::pair<int,int> position){
+void CGame::GenerateWall(std::pair<int,int> position)
+{
 	std::uniform_int_distribution<int> wall_length_range(3, 8);
 	int wall_length = wall_length_range(m_engine);
 
 	std::uniform_int_distribution<int> start_ypos_range(position.first - wall_length, position.first);
 	int start_ypos = start_ypos_range(m_engine);
 
-	for(int i = 0; i < wall_length; i++){
+	for(int i = 0; i < wall_length; i++)
+	{	
 		if(start_ypos + i > 0 && start_ypos + i < m_maxheight - 4){
 			m_map[start_ypos + i][position.second] = -8;
 			v_borders.push_back(TBorder(start_ypos + i, position.second));
@@ -456,25 +415,32 @@ void CGame::GenerateWall(std::pair<int,int> position){
 
 void CGame::GenerateTower(std::pair<int,int> position1, 
 					   	  std::pair<int,int> position2, 
-					      std::pair<int,int> position3, const int & choice){
-	
+					      std::pair<int,int> position3, 
+					      const int & 		 choice)
+{
 	std::uniform_int_distribution<int> basic_range(-1, 1);
 	int basic_pos = basic_range(m_engine);
 	
+	// the tower should not be placed directly in the path
 	while(basic_pos == 0)
 		basic_pos = basic_range(m_engine);
 
+
 	std::uniform_int_distribution<int> advanced_range(-2, 2);
 	int advanced_pos = advanced_range(m_engine);
-	
+
+	// the tower should not be placed directly in the path
 	while(advanced_pos == 0)
 		advanced_pos = advanced_range(m_engine);
 
 
 	switch(choice){
+		//ADVANCED TOWER
 		case 1:
 			GenerateAdvancedTower(advanced_pos, position1, position2, position3);
 			break;
+
+		//BASIC TOWER (higher chance to be chosen)
 		case 2:
 		case 3:
 			GenerateBasicTower(basic_pos, position1, position2);
@@ -482,15 +448,20 @@ void CGame::GenerateTower(std::pair<int,int> position1,
 	}
 }
 
-void CGame::GenerateBasicTower(int & placement, std::pair<int,int> position1, 
-												std::pair<int,int> position2){
-
+void CGame::GenerateBasicTower(int & placement, 
+							   std::pair<int,int> position1, 
+							   std::pair<int,int> position2)
+{
+	//tower cannot be placed at 0 vertical position
 	while(position1.first + placement < 1)
 		placement++;
 	
+	//tower cannot be placed above maximum height - 4
 	while(position1.first + placement > m_maxheight - 4)
 		placement--;
 
+	//if the next step on the path has the same horizontal position,
+	//place the tower one horizontal position to the right 
 	if(position2.second == position1.second)
 		position1.second++;
 
@@ -498,15 +469,21 @@ void CGame::GenerateBasicTower(int & placement, std::pair<int,int> position1,
 	v_towers.push_back(new CBasicTower (position1.first + placement, position1.second));
 }
 
-void CGame::GenerateAdvancedTower(int & placement, std::pair<int,int> position1, 
-												   std::pair<int,int> position2, 
-												   std::pair<int,int> position3){
+void CGame::GenerateAdvancedTower(int & placement, 
+								  std::pair<int,int> position1, 
+								  std::pair<int,int> position2, 
+								  std::pair<int,int> position3)
+{	
+	//tower cannot be placed at 0 vertical position	
 	while(position1.first + placement < 1)
 		placement++;
 	
+	//tower cannot be placed above maximum height - 4	
 	while(position1.first + placement > m_maxheight - 4)
 		placement--;
 
+	//if the second next step has the same horizontal position,
+	//place the tower one horizontal position to the right 
 	if(position3.second == position1.second)
 		position1.second++;
 
@@ -514,10 +491,12 @@ void CGame::GenerateAdvancedTower(int & placement, std::pair<int,int> position1,
 	v_towers.push_back(new CAdvancedTower (position1.first + placement, position1.second));
 }
 
-void CGame::GenerateGates(){
+void CGame::GenerateGates()
+{
 	std::uniform_int_distribution<int> height_range(1, m_maxheight - 4);
 	std::uniform_int_distribution<int> num_of_gates(2, 3);
 
+	//two gates
 	if(num_of_gates(m_engine) == 2){
 		std::uniform_int_distribution<int> first_half(1, (m_maxheight - 4) / 2);
 		std::uniform_int_distribution<int> second_half((m_maxheight - 4) / 2 + 1, m_maxheight - 4);
@@ -532,6 +511,7 @@ void CGame::GenerateGates(){
 
 		m_exit_gate = gate3;
 	}
+	//three gates
 	else{
 		std::uniform_int_distribution<int> first_third(1, (m_maxheight - 4) / 3);
 		std::uniform_int_distribution<int> second_third((m_maxheight - 4) / 3 + 1, (m_maxheight - 4) * 2/3);
@@ -551,7 +531,8 @@ void CGame::GenerateGates(){
 	}
 }
 
-void CGame::NewGame(){
+void CGame::NewGame()
+{
 	getmaxyx(stdscr, m_maxheight, m_maxwidth);
 
 	v_towers.clear();
@@ -561,11 +542,13 @@ void CGame::NewGame(){
 	v_restricted_area.clear();
 	
 	RestrictArea();
+
 	GenerateGates();
 
 	GenerateMap();
 
 	SetGoal();
+
 	AssignBorders();
 
 	CMap map(v_towers, v_gates, v_borders, m_maxheight, m_maxwidth, m_exit_gate);
@@ -576,7 +559,8 @@ void CGame::NewGame(){
 	endwin();
 }
 
-bool CGame::LoadGame(ifstream & file){
+bool CGame::LoadGame(ifstream & file)
+{
 	v_towers.clear();
 	v_attackers.clear();
 	v_gates.clear();
@@ -586,6 +570,8 @@ bool CGame::LoadGame(ifstream & file){
 
 	int maxheightLoaded, maxwidthLoaded;
 	int money = 0;
+
+	//read the header
 	if(!(file >> maxheightLoaded >> maxwidthLoaded >> m_attackers_won >> m_goal >> money)){
 		printw("Header of the file is invalid, please check the first line.");
 		refresh();
@@ -594,15 +580,20 @@ bool CGame::LoadGame(ifstream & file){
 	}
 
 	CheckResolution(maxheightLoaded, maxwidthLoaded);
+
 	CheckGoal();
 
 	clear();
+
 
 	char object, type;
 	int ypos, xpos;
 	int health = 0, stunned = 0;
 	int line_number = 1;
-	while(file >> object >> type >> ypos >> xpos){
+
+	//read the objects
+	while(file >> object >> type >> ypos >> xpos)
+	{
 		if(object == 'A' && !(file >> health >> stunned)){
 			line_number++;
 			break;
@@ -621,20 +612,13 @@ bool CGame::LoadGame(ifstream & file){
 		usleep(2400000);
 		return false;
 	}
-
-	for(unsigned int i = 0; i < v_gates.size(); i++){
-		if(v_gates[i].GateType() != G_EXIT){
-			ClearMap();
-			v_gates[i].path = FindPath(v_gates[i]);
-		}
-	}
 	
 	if(!AssignPaths())
 		return false;
 
 	AssignBorders();
 	
-	printw("Game loaded!");
+	printw("Game successfully loaded!");
 	refresh();
 	usleep(190000);
 	clear();
@@ -649,19 +633,33 @@ bool CGame::LoadGame(ifstream & file){
 	return true;
 }
 
-void CGame::AssignBorders(){
-	for(unsigned int i = 0; i < v_towers.size(); i++){
+void CGame::AssignBorders()
+{
+	for(unsigned int i = 0; i < v_towers.size(); i++)
+	{
 			v_towers[i]->AssignBorders(v_borders);
 			v_towers[i]->CheckRange();
 	}
 }
 
-bool CGame::AssignPaths(){
+bool CGame::AssignPaths()
+{
 	for(unsigned int i = 0; i < v_gates.size(); i++)
-		for(unsigned int j = 0; j < v_attackers.size(); j++){
+	{
+		if(v_gates[i].GateType() != G_EXIT){
+			ClearMap();
+			v_gates[i].path = FindPath(v_gates[i]);
+		}
+	}
+
+
+	for(unsigned int i = 0; i < v_gates.size(); i++)
+		for(unsigned int j = 0; j < v_attackers.size(); j++)
+		{
 			if(!v_attackers[j]->IsAssigned() && v_gates[i].GateType() != G_EXIT)
 			    v_attackers[j]->AssignPath(v_gates[i]);
 		}
+
 
 	for(unsigned int i = 0; i < v_attackers.size(); i++)
 		if(!v_attackers[i]->IsAssigned()){
@@ -674,44 +672,58 @@ bool CGame::AssignPaths(){
 	return true;
 }
 
-bool CGame::CreateObject(const char & object,    const char & type, 
-						 const int & ypos, 	     const int & xpos, 
-						 const int & health, 	 const bool & stunned){
-	
+bool CGame::CreateObject(const char & object,    
+						 const char & type, 
+						 const int & ypos, 	     
+						 const int & xpos, 
+						 const int & health, 	 
+						 const bool & stunned)
+{	
 	if(ypos > m_maxheight - 4 || ypos < 1 || xpos > m_maxwidth - 2 || xpos < 1){
 		return false;
 	}
 
-	switch(object){
+	switch(object)
+	{
 		case 'T':
 			return CreateTower(type, ypos, xpos);
 			break;
+		
 		case 'A':
 			return CreateAttacker(type, ypos, xpos, health, stunned);
 			break;
+		
 		case 'G':
 			return CreateGate(type, ypos, xpos);
 			break;
+		
 		case 'B':
 			return CreateBorder(type, ypos, xpos);
 			break;
+		
 		default:
 			return false;
 	}
+
 	return true;
 }
 
-bool CGame::CreateTower(const char & type, const int & ypos, const int & xpos){
-
+bool CGame::CreateTower(const char & type, 
+						const int & ypos, 
+						const int & xpos)
+{
 	if(xpos < 3 || xpos > m_maxwidth - 5) return false;
 
-	switch(type){
+	switch(type)
+	{
 		case T_BASIC:
 			v_towers.push_back(new CBasicTower(ypos, xpos));
 			break;
+		
 		case T_ADVANCED:
 			v_towers.push_back(new CAdvancedTower(ypos, xpos));
 			break;
+
 		default:
 			return false;
 	}
@@ -719,8 +731,12 @@ bool CGame::CreateTower(const char & type, const int & ypos, const int & xpos){
 	return true;
 }
 
-bool CGame::CreateAttacker(const char & type, const int & ypos, const int & xpos,  const int & health, const bool & stunned){
-
+bool CGame::CreateAttacker(const char & type, 
+						   const int & ypos, 
+						   const int & xpos,  
+						   const int & health, 
+	   					   const bool & stunned)
+{
 	if(xpos == 1 || xpos == m_maxwidth - 2) return false;
 
 	switch(type){
@@ -737,7 +753,10 @@ bool CGame::CreateAttacker(const char & type, const int & ypos, const int & xpos
 	return true;
 }
 
-bool CGame::CreateGate(const char & type, const int & ypos, const int & xpos){   										
+bool CGame::CreateGate(const char & type, 
+					   const int & ypos, 
+					   const int & xpos)
+{   										
 	if((xpos != 1 && xpos != m_maxwidth - 2) || 
 	   (type != G_EXIT && type != '1' && type != '2' && type != '3'))
 		return false;
@@ -750,14 +769,20 @@ bool CGame::CreateGate(const char & type, const int & ypos, const int & xpos){
 	return true;
 }
 
-bool CGame::CreateBorder(const char & type, const int & ypos, const int & xpos){
+bool CGame::CreateBorder(const char & type, 
+						 const int & ypos, 
+						 const int & xpos)
+{
 	if(xpos < 3 || xpos > m_maxwidth - 5 || type != BORDER) return false;
 
 	v_borders.push_back(TBorder(ypos, xpos));
 	return true;
 }
 
-void CGame::SaveGame(const CMap & map){
+void CGame::SaveGame(const CMap & map)
+{
+	//name of the file with saved game consists of time and date
+	//of its saving
 	time_t t = time(0);
 	struct tm * now = localtime(&t);
 
@@ -784,15 +809,16 @@ void CGame::SaveGame(const CMap & map){
 	nodelay(stdscr, true);
 	clear();
 
+	//write the header
 	outputFile << m_maxheight << " " << m_maxwidth << " " << map.AttackersWon() << " " << m_goal << " " << map.Money() << '\n';
 
-
-	for(unsigned int i = 0; i < v_gates.size(); i++){
+	//write gates
+	for(unsigned int i = 0; i < v_gates.size(); i++)
 		outputFile << "G " << v_gates[i].GateType() << " " <<v_gates[i].GateYpos() << " " << v_gates[i].GateXpos() << '\n';
-	}
 
-
-	for(unsigned int i = 0; i < map.v_attackers.size(); i++){
+	//write attackers
+	for(unsigned int i = 0; i < map.v_attackers.size(); i++)
+	{
 		if(map.v_attackers[i]->AttackerType() == A_DEAD || map.v_attackers[i]->HasWon())
 			continue;
 
@@ -800,21 +826,19 @@ void CGame::SaveGame(const CMap & map){
 		<< map.v_attackers[i]->AttackerXpos() << '\n';
 		
 		outputFile << map.v_attackers[i]->AttackerHealth() << " " << map.v_attackers[i]->IsStunned() << '\n';
-
 	}
 
-
-	for(unsigned int i = 0; i < v_towers.size(); i++){
+	//write towers
+	for(unsigned int i = 0; i < v_towers.size(); i++)
 		outputFile << "T " << v_towers[i]->TowerType() << " " << v_towers[i]->TowerYpos() << " " << v_towers[i]->TowerXpos() << '\n';
-	}
 
-
-	for(unsigned int i = 0; i < v_borders.size(); i++){
+	//write borders
+	for(unsigned int i = 0; i < v_borders.size(); i++)
 		outputFile << "B #" << v_borders[i].t_ypos << " " << v_borders[i].t_xpos << '\n';
-	}
 }
 
-void CGame::CheckGoal(){
+void CGame::CheckGoal()
+{
 	if(m_goal > 15 || m_goal < 5){
 		clear();
 		printw("Goal out of interval <5,15>, setting it to 15.");
@@ -825,8 +849,10 @@ void CGame::CheckGoal(){
 	}
 }
 
-void CGame::CheckResolution(const int & maxheightLoaded, const int & maxwidthLoaded){
-		if(m_maxheight < maxheightLoaded || m_maxwidth < maxwidthLoaded){
+void CGame::CheckResolution(const int & maxheightLoaded, 
+							const int & maxwidthLoaded)
+{
+	if(m_maxheight < maxheightLoaded || m_maxwidth < maxwidthLoaded){
 		resizeterm(maxwidthLoaded, maxwidthLoaded);
 		clear();
 		printw("Widen the terminal window, please.");

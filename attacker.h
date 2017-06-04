@@ -1,7 +1,6 @@
-#include "gate.h"
-#include <curses.h>
-#include <iostream>
 #include <unistd.h>
+
+#include "gate.h"
 
 using namespace std;
 

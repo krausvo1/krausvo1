@@ -1,7 +1,9 @@
 #ifndef ADVANCEDT_H
 #define ADVANCEDT_H
+
+#include <cmath>
+
 #include "tower.h"
-#include "attacker.h"
 
 class CAdvancedTower : public CTower{
 public:

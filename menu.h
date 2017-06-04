@@ -1,5 +1,6 @@
 #ifndef MENU_H
 #define MENU_H
+
 #include "game.h"
 
 	/*!
@@ -24,7 +25,7 @@ public:
 	void Start();
 
 	/*!
-	* Recieve name of the file to be loaded
+	* Receive name of the file to be loaded
 	* @return file to be loaded
 	*/
 	void Load();

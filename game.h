@@ -2,19 +2,14 @@
 #define GAME_H
 
 #include <fstream>
-#include <iostream>
 #include <algorithm>
-#include <vector>
 #include <random>
-#include "basicT.h"
-#include "advancedT.h"
-#include "basicA.h"
-#include "advancedA.h"
-#include "gate.h"
-#include "map.h"
-#include "border.h"
+#include <ctime>
+#include <string>
+#include <cstring>
 
-using namespace std;
+#include "map.h"
+
 
 class CGame{
 public:
@@ -23,65 +18,88 @@ public:
 
 	void NewGame();
 
-	bool LoadGame(ifstream & file);
+	bool LoadGame						(ifstream & file);
 
-	void StartGame(CMap & map);
+	void StartGame						(CMap & map);
 
-	void SaveGame(const CMap & map);
+	void SaveGame						(const CMap & map);
 
 	void RestrictArea();
 
-	void CountMoney(CMap & map);
+	void CountMoney						(CMap & map);
 
 	void SetExit();
+	
 	void SetGoal();
+	
 	void CheckGoal();
-	void CheckResolution(const int & maxheightLoaded, const int & maxwidthLoaded);
+	
+	void CheckResolution				(const int & maxheightLoaded, 
+						 				 const int & maxwidthLoaded);
 
-	bool CheckVictory(const int & attackers_won);
-	bool CheckGameOver(const int & money, const int & attackers_alive);
+	bool CheckVictory					(const int & attackers_won);
+	
+	bool CheckGameOver					(const int & money, 
+					 					 const int & attackers_alive);
 
 	void AssignBorders();
+	
 	bool AssignPaths();
-
 
 	void ClearMap();
 
-	vector<pair<int,int> > FindPath(CGate & start);
+	std::vector< std::pair<int,int> > FindPath		(CGate & start);
 
 	void GenerateMap();
 
 	void GenerateGates();
 
-	void GenerateWall(std::pair<int,int> position);
+	void GenerateWall					(std::pair<int,int> position);
 
-	void GenerateTower(std::pair<int,int> position1, 
-					   std::pair<int,int> position2, 
-					   std::pair<int,int> position3, const int & choice);
+	void GenerateTower					(std::pair<int,int> position1, 
+					  					 std::pair<int,int> position2, 
+					  					 std::pair<int,int> position3, 
+					  					 const int & choice);
 
-	void GenerateBasicTower(int & placement, std::pair<int,int> position1, 
-										     std::pair<int,int> position2);
+	void GenerateBasicTower				(int & placement, 
+										 std::pair<int,int> position1, 
+			    		   				 std::pair<int,int> position2);
 
-	void GenerateAdvancedTower(int & placement, std::pair<int,int> position1, 
-											    std::pair<int,int> position2, 
-											    std::pair<int,int> position3);
+	void GenerateAdvancedTower			(int & placement, 
+							   			 std::pair<int,int> position1, 
+							   			 std::pair<int,int> position2, 
+							   			 std::pair<int,int> position3);
 
-	void PlaceObstacle(std::pair<int,int> position1, 
-					    std::pair<int,int> position2, 
-					    std::pair<int,int> position3, const int & eliminate);
+	void PlaceObstacle					(std::pair<int,int> position1, 
+					  					 std::pair<int,int> position2, 
+					  					 std::pair<int,int> position3, 
+					  					 const int & eliminate);
 
 
-	bool CreateObject				(const char & object,   const char & type, 
-					 				 const int & ypos,      const int & xpos,
-					 				 const int & health, 	const bool & stunned);
+	bool CreateObject					(const char & object,   
+					 					 const char & type, 
+	 				 					 const int & ypos,      
+	 				 					 const int & xpos,
+	 				 					 const int & health, 	
+	 				 					 const bool & stunned);
 
-	bool CreateTower(const char & type, const int & ypos, const int & xpos);
+	bool CreateTower					(const char & type, 
+										 const int & ypos, 
+										 const int & xpos);
 
-	bool CreateAttacker(const char & type, const int & ypos, const int & xpos, const int & health, const bool & stunned);
+	bool CreateAttacker					(const char & type, 
+										 const int & ypos, 
+									 	 const int & xpos, 
+										 const int & health, 
+										 const bool & stunned);
 	
-	bool CreateGate(const char & type, const int & ypos, const int & xpos);
+	bool CreateGate						(const char & type, 
+										 const int & ypos, 
+										 const int & xpos);
 
-	bool CreateBorder(const char & type, const int & ypos, const int & xpos);
+	bool CreateBorder					(const char & type, 
+					 					 const int & ypos,
+					 					 const int & xpos);
 
 
 private:
@@ -103,7 +121,7 @@ private:
 
 	std::mt19937 m_engine;
 
-	std::vector<std::pair<int,int>> v_restricted_area;
+	std::vector< std::pair<int,int> > v_restricted_area;
 
 	int m_attackers_won;
 };

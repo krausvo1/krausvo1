@@ -1,9 +1,4 @@
 #include "gate.h"
-#include <iostream>
-#include <cstdlib>
-#include <curses.h>
-#include <vector>
-
 
 CGate::CGate(const char & gate_type, const int & ypos, const int & xpos, const int & gate_ID):
 		    path(), m_gate_type(gate_type), m_ypos(ypos), m_xpos(xpos), m_gate_ID(gate_ID){}
