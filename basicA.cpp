@@ -1,24 +1,17 @@
 #include "basicA.h"
 
 CBasicAttacker::CBasicAttacker(const int & ypos, const int & xpos, const int & ID, const int & health, const bool & stunned):
-							   CAttacker(A_BASIC, ypos, xpos, ID, health), m_stunned(stunned), m_escorted(false){} //LOAD
+							   CAttacker(A_BASIC, ypos, xpos, ID, health), m_stunned(stunned){} //LOAD
 
 
 CBasicAttacker::CBasicAttacker(const CGate & start, const int & ID):
-							   CAttacker(A_BASIC, start, ID, 150), m_stunned(false), m_escorted(false){} //NEW
+							   CAttacker(A_BASIC, start, ID, 150), m_stunned(false){} //NEW
 
 
 void CBasicAttacker::TakeHit(const int & damage, const bool & stun){
 	m_hit = true;
 	m_health -= damage;
 	m_stunned = stun;
-}
-
-void CBasicAttacker::SetIsEscorted(const bool & escorted){
-	if(escorted)
-		m_escorted = true;
-	else
-		m_escorted = false;
 }
 
 bool CBasicAttacker::Move(){
@@ -43,7 +36,7 @@ bool CBasicAttacker::Move(){
 	addch(m_attacker_type);
 
 	if(m_start.path.size() != m_moves){
-		if(!m_escorted)
+		if(!m_giving_way)
 			m_moves += 2; //kolik pohybů attacker udělal
 		else
 			m_moves++;

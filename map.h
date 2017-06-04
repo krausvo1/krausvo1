@@ -19,9 +19,9 @@ public:
 	CMap(const std::vector<CTower*> & towers, const std::vector<CGate> & gates, const std::vector<TBorder> & borders, 
 		 const int & maxheight, const int & maxwidth, const CGate & exit);
 	
-	CMap(const std::vector<CTower*> & towers, const std::vector<CGate> & gates,
-		 const std::vector<CAttacker*> & attackers, const std::vector<TBorder> & borders, const int & maxheight, const int & maxwidth,
-		 const CGate & exit, const int & money);
+	CMap(const std::vector<CAttacker*> & attackers, const std::vector<CTower*> & towers, const std::vector<CGate> & gates,
+		 const std::vector<TBorder> & borders, const int & maxheight, const int & maxwidth,
+		 const CGate & exit, const int & attackers_won, const int & money);
 
 	~CMap();
 
@@ -33,7 +33,7 @@ public:
 
 	void CheckCollisions();
 
-	void CheckEscorts(CAttacker & attacker);
+	void CheckPriorities(CAttacker & attacker);
 
 	void PrintBorders() const;
 	void PrintTowers() const;
@@ -46,18 +46,28 @@ public:
 	void AddAttacker (const CGate & gate);
 
 
+	int AttackersWon() const;
+	int AttackersAlive() const;
+	
+	int Money() const;
+	void AddMoney(const int & money);
+	void SetMoney(const int & money);
+	
+	bool LogsON() const;
 
+	std::vector<CAttacker*> v_attackers;
+
+private:
 	std::vector<CTower*> v_towers;
 	std::vector<CGate> v_gates;
-	std::vector<CAttacker*> v_attackers;
 	std::vector<TLog> v_logs;
 	std::vector<TBorder> v_borders;
 
 	int m_attackers_alive;
 	int m_first_not_loaded;
 
-	const int m_maxheight;
-	const int m_maxwidth;
+	int m_maxheight;
+	int m_maxwidth;
 
 	CGate m_exit_gate;
 

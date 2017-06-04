@@ -80,14 +80,14 @@ void CGame::CountMoney(CMap & map){
 	}
 
 	avg_damage = avg_damage / (v_gates.size() - 1);
-	map.m_money = (avg_damage / 200 + 2) * 1000;
+	map.SetMoney((avg_damage / 200 + 2) * 1000);
 
 	if(m_goal > 8)
-		map.m_money += 1000;
+		map.AddMoney(1000);
 }
 
 void CGame::StartGame(CMap & map){		
-	if(map.m_money == 0)
+	if(map.Money() == 0)
 		CountMoney(map);
 
 	nodelay(stdscr, true);
@@ -98,14 +98,14 @@ void CGame::StartGame(CMap & map){
 
 		move(m_maxheight - 2, 0);
 		printw("Attackers alive: %d, attackes won: %d, goal: %d, money: %d$", 
-			map.m_attackers_alive, map.m_attackers_won, m_goal, map.m_money);
+			map.AttackersAlive(), map.AttackersWon(), m_goal, map.Money());
 
-		if(map.m_attackers_won > m_attackers_won){
-			m_attackers_won = map.m_attackers_won;
-			map.m_money += 600;
+		if(map.AttackersWon() > m_attackers_won){
+			m_attackers_won = map.AttackersWon();
+			map.AddMoney(600);
 		}
 
-		if(map.m_logs_on){
+		if(map.LogsON()){
 			printw(", logs: ON");
 			map.PrintLogs();
 		}
@@ -113,7 +113,7 @@ void CGame::StartGame(CMap & map){
 			printw(", logs: OFF");
 
 		
-		if(CheckVictory(map.m_attackers_won) || CheckGameOver(map.m_money, map.m_attackers_alive)){
+		if(CheckVictory(map.AttackersWon()) || CheckGameOver(map.Money(), map.AttackersAlive())){
 			nodelay(stdscr, false);
 			while(1){
 				switch(getch()){
@@ -146,8 +146,7 @@ void CGame::StartGame(CMap & map){
 				map.AddAttacker(v_gates[0]);
 				continue;
 			case '2':
-				if(v_gates.size() > 2)
-					map.AddAttacker(v_gates[1]);
+				map.AddAttacker(v_gates[1]);
 				continue;
 			case '3':
 				if(v_gates.size() > 3)
@@ -587,7 +586,7 @@ bool CGame::LoadGame(ifstream & file){
 
 	int maxheightLoaded, maxwidthLoaded;
 	int money = 0;
-	if(!(file >> maxheightLoaded >> maxwidthLoaded >> m_goal >> money)){
+	if(!(file >> maxheightLoaded >> maxwidthLoaded >> m_attackers_won >> m_goal >> money)){
 		printw("Header of the file is invalid, please check the first line.");
 		refresh();
 		usleep(2000000);
@@ -640,7 +639,7 @@ bool CGame::LoadGame(ifstream & file){
 	usleep(190000);
 	clear();
 
-	CMap map(v_towers, v_gates, v_attackers, v_borders, m_maxheight, m_maxwidth, m_exit_gate, money);
+	CMap map(v_attackers, v_towers, v_gates, v_borders, m_maxheight, m_maxwidth, m_exit_gate, m_attackers_won, money);
 	
 	StartGame(map);
 
@@ -785,7 +784,7 @@ void CGame::SaveGame(const CMap & map){
 	nodelay(stdscr, true);
 	clear();
 
-	outputFile << m_maxheight << " " << m_maxwidth << " " << m_goal << " " << map.m_money << '\n';
+	outputFile << m_maxheight << " " << m_maxwidth << " " << map.AttackersWon() << " " << m_goal << " " << map.Money() << '\n';
 
 
 	for(unsigned int i = 0; i < v_gates.size(); i++){
@@ -794,7 +793,7 @@ void CGame::SaveGame(const CMap & map){
 
 
 	for(unsigned int i = 0; i < map.v_attackers.size(); i++){
-		if(map.v_attackers[i]->AttackerType() == A_DEAD)
+		if(map.v_attackers[i]->AttackerType() == A_DEAD || map.v_attackers[i]->HasWon())
 			continue;
 
 		outputFile << "A " << map.v_attackers[i]->AttackerType() << " " << map.v_attackers[i]->AttackerYpos() << " " 
@@ -810,8 +809,8 @@ void CGame::SaveGame(const CMap & map){
 	}
 
 
-	for(unsigned int i = 0; i < map.v_borders.size(); i++){
-		outputFile << "B #" << map.v_borders[i].t_ypos << " " << map.v_borders[i].t_xpos << '\n';
+	for(unsigned int i = 0; i < v_borders.size(); i++){
+		outputFile << "B #" << v_borders[i].t_ypos << " " << v_borders[i].t_xpos << '\n';
 	}
 }
 

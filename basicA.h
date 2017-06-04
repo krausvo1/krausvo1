@@ -42,19 +42,10 @@ public:
 	*/
 	virtual bool Move();
 
-	/*!
-	* Sets m_stunned variable to true or false
-	* @param escorted bool value m_stunned variable is being set to 
-	*/
-	virtual void SetIsEscorted(const bool & escorted);
-
 private:
 
 	//! Decides whether this attacker is going to be stunned for a round or not
 	bool m_stunned;
-
-	//! Decides whether the attacker moves directly behind an advanced attacker or not
-	bool m_escorted;
 };
 
 #endif

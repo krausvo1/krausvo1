@@ -2,7 +2,8 @@
 
 CAttacker::CAttacker(const char & type, const CGate & start, const int & ID, const int & health):
 					m_start(start), m_attacker_type(type), m_ypos(start.GateYpos()), m_xpos(start.GateXpos()), //NEW
-					m_hit(false), m_health(health), m_attacker_ID(ID), m_moves(2), m_attacker_won(false), m_assigned(false)
+					m_hit(false), m_health(health), m_attacker_ID(ID), m_moves(2), m_attacker_won(false), m_assigned(false),
+					m_giving_way(false)
 {
 	real_ypos = m_start.path[m_start.path.size() - (m_moves)].first;
 	real_xpos = m_start.path[m_start.path.size() - (m_moves)].second;
@@ -12,7 +13,7 @@ CAttacker::CAttacker(const char & type, const CGate & start, const int & ID, con
 CAttacker::CAttacker(const char & type, const int & ypos, const int & xpos, const int & ID, const int & health): //LOAD 
 					m_start(CGate()), m_attacker_type(type), m_ypos(ypos), m_xpos(xpos), 
 					m_hit(false), m_health(health), m_attacker_ID(ID),
-					m_moves(1), m_attacker_won(false), m_assigned(false){}
+					m_moves(1), m_attacker_won(false), m_assigned(false), m_giving_way(false){}
 
 
 void CAttacker::AssignPath(const CGate & gate){
@@ -36,6 +37,13 @@ bool CAttacker::CheckWin(){
 	}
 
 	return false;
+}
+
+void CAttacker::GiveWay(const bool & give_way){
+	if(give_way)
+		m_giving_way = true;
+	else
+		m_giving_way = false;
 }
 
 bool CAttacker::IsInGame() const{

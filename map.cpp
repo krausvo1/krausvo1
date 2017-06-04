@@ -15,12 +15,12 @@ CMap::CMap(const std::vector<CTower*> & towers, const std::vector<CGate> & gates
 {
 }
 
-CMap::CMap(const std::vector<CTower*> & towers, const std::vector<CGate> & gates,
-		   const std::vector<CAttacker*> & attackers, const std::vector<TBorder> & borders, 
-		   const int & maxheight, const int & maxwidth, const CGate & exit, const int & money):
-		   v_towers(towers), v_gates(gates), v_attackers(attackers), v_borders(borders), m_attackers_alive(0), 
+CMap::CMap(const std::vector<CAttacker*> & attackers, const std::vector<CTower*> & towers, const std::vector<CGate> & gates,
+		   const std::vector<TBorder> & borders, const int & maxheight, const int & maxwidth, const CGate & exit, 
+		   const int & attackers_won, const int & money):
+		   v_attackers(attackers), v_towers(towers), v_gates(gates), v_borders(borders), m_attackers_alive(0), 
 		   m_first_not_loaded(attackers.size()), m_maxheight(maxheight), m_maxwidth(maxwidth), m_exit_gate(exit), 
-		   m_attackers_won(0), m_logs_on(true), m_money(money)
+		   m_attackers_won(attackers_won), m_logs_on(true), m_money(money)
 {
 }
 
@@ -119,8 +119,7 @@ void CMap::PrintAttackers(){
 			attron(COLOR_PAIR(1));
 		}
 
-		if(v_attackers[i]->AttackerType() == A_BASIC)
-			CheckEscorts(*v_attackers[i]);
+		CheckPriorities(*v_attackers[i]);
 
 		if(!v_attackers[i]->HasWon() && v_attackers[i]->AttackerType() != A_DEAD && v_attackers[i]->Move()){
 			if(v_attackers[i]->CheckWin()){
@@ -135,18 +134,23 @@ void CMap::PrintAttackers(){
 	}
 }
 
-void CMap::CheckEscorts(CAttacker & attacker){
+void CMap::CheckPriorities(CAttacker & attacker){
+	int difference;
+	if(attacker.AttackerType() == A_ADVANCED)
+		difference = 1;
+	else
+		difference = 2;
+
 	for(unsigned int i = 0; i < v_attackers.size() - 1; i++){
-		if((v_attackers[i]->AttackerType() == A_ADVANCED) && 
-		   (v_attackers[i]->m_start.path.size() - (attacker.AttackerMoves() + 2) > 0) &&
-		   (v_attackers[i]->AttackerRealYpos() == attacker.m_start.path[attacker.m_start.path.size() - (attacker.AttackerMoves() + 2)].first) &&
-		   (v_attackers[i]->AttackerRealXpos() == attacker.m_start.path[attacker.m_start.path.size() - (attacker.AttackerMoves() + 2)].second))
+		if((v_attackers[i]->m_start.path.size() - (attacker.AttackerMoves() + 2) > 0) && (v_attackers[i]->IsInGame()) &&
+		   (v_attackers[i]->AttackerRealYpos() == attacker.m_start.path[attacker.m_start.path.size() - (attacker.AttackerMoves() + difference)].first) &&
+		   (v_attackers[i]->AttackerRealXpos() == attacker.m_start.path[attacker.m_start.path.size() - (attacker.AttackerMoves() + difference)].second))
 		{
-			attacker.SetIsEscorted(true);
+			attacker.GiveWay(true);
 			break;
 		}
 		else
-			attacker.SetIsEscorted(false);
+			attacker.GiveWay(false);
 	}
 }
 
@@ -239,4 +243,28 @@ int CMap::TestRound(const int & gate_number){
 	}
 
 	return 200 - test.AttackerHealth();
+}
+
+int CMap::AttackersWon() const{
+	return m_attackers_won;
+}
+
+int CMap::AttackersAlive() const{
+	return m_attackers_alive;
+}
+
+int CMap::Money() const{
+	return m_money;
+}
+
+void CMap::AddMoney(const int & money){
+	m_money += money;
+}
+
+void CMap::SetMoney(const int & money){
+	m_money = money;
+}
+
+bool CMap::LogsON() const{
+	return m_logs_on;
 }

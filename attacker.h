@@ -79,7 +79,7 @@ public:
 	* Sets m_stunned variable to true or false
 	* @param escorted bool value m_stunned variable is being set to 
 	*/
-	virtual void SetIsEscorted(const bool & escorted){}
+	virtual void GiveWay(const bool & give_way);
 
 	char AttackerType() const;
 
@@ -131,6 +131,9 @@ protected:
 	bool m_stunned;
 
 	bool m_assigned;
+
+	//! Decides whether the attacker moves is giving way another attacker or not
+	bool m_giving_way;
 };
 
 #endif
