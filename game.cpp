@@ -91,9 +91,9 @@ void CGame::StartGame(CMap & map)
 
 	nodelay(stdscr, true);
 
-	while(1){
-
-		map.NextFrame();
+	while(1)
+	{
+		map.NextRound();
 
 		move(m_maxheight - 2, 0);
 		printw("Attackers alive: %d, attackes won: %d, goal: %d, money: %d$", 
@@ -181,29 +181,29 @@ void CGame::StartGame(CMap & map)
 void CGame::ClearMap()
 {
 	m_map.resize(m_maxheight);
-	for(unsigned int i = 0; i < m_maxheight; i++)
+	for(int i = 0; i < m_maxheight; i++)
 		m_map[i].resize(m_maxwidth);
 
 
-	for(unsigned int i = 0; i < m_maxheight; i++)
-		for(unsigned int j = 0; j < m_maxwidth; j++)
+	for(int i = 0; i < m_maxheight; i++)
+		for(int j = 0; j < m_maxwidth; j++)
 			m_map[i][j] = 0;
 
 	//Place borders:
 	//from top left corner to top right corner
-	for(unsigned int i = 0; i < m_maxwidth; i++)
+	for(int i = 0; i < m_maxwidth; i++)
 		m_map[0][i] = -8;
 
 	//from bottom left corner to bottom right corner
-	for(unsigned int i = 0; i < m_maxwidth; i++)
+	for(int i = 0; i < m_maxwidth; i++)
 		m_map[m_maxheight - 3][i] = -8;
 
 	//from bottom left corner to top left corner
-	for(unsigned int i = 0; i < m_maxheight - 3; i++)
+	for(int i = 0; i < m_maxheight - 3; i++)
 		m_map[i][0] = -8;
 
 	//from top right corner to bottom right corner
-	for(unsigned int i = 0; i < m_maxheight - 3; i++)
+	for(int i = 0; i < m_maxheight - 3; i++)
 		m_map[i][m_maxwidth - 1] = -8;
 	
 	//place generated borders
@@ -437,7 +437,7 @@ void CGame::GenerateTower(std::pair<int,int> position1,
 	switch(choice){
 		//ADVANCED TOWER
 		case 1:
-			GenerateAdvancedTower(advanced_pos, position1, position2, position3);
+			GenerateAdvancedTower(advanced_pos, position1, position3);
 			break;
 
 		//BASIC TOWER (higher chance to be chosen)
@@ -471,7 +471,6 @@ void CGame::GenerateBasicTower(int & placement,
 
 void CGame::GenerateAdvancedTower(int & placement, 
 								  std::pair<int,int> position1, 
-								  std::pair<int,int> position2, 
 								  std::pair<int,int> position3)
 {	
 	//tower cannot be placed at 0 vertical position	
@@ -638,7 +637,7 @@ void CGame::AssignBorders()
 	for(unsigned int i = 0; i < v_towers.size(); i++)
 	{
 			v_towers[i]->AssignBorders(v_borders);
-			v_towers[i]->CheckRange();
+			v_towers[i]->CheckBlindSpots();
 	}
 }
 

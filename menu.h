@@ -4,11 +4,11 @@
 #include "game.h"
 
 	/*!
-	* Class for representation of graphical menu
+	* Class representing a graphical menu
 	*/
-
 class CMenu : public CGame{
 public:
+	
 	/*!
 	* Constructor initialises ncurses features
 	*/
@@ -26,10 +26,8 @@ public:
 
 	/*!
 	* Receive name of the file to be loaded
-	* @return file to be loaded
 	*/
 	void Load();
 };
-
 
 #endif

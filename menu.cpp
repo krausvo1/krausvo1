@@ -1,13 +1,15 @@
 #include "menu.h"
 
-CMenu::CMenu(){
+CMenu::CMenu()
+{
 	initscr();
 	noecho();
 	curs_set(0);
 	keypad(stdscr, true);
 }
 
-void CMenu::Start(){
+void CMenu::Start()
+{
 	clear();
 	move(0,0);
 	printw("Press N to start new game.");
@@ -23,25 +25,34 @@ void CMenu::Start(){
 
 	move(0,0);
 
-	while(1){
-		switch(getchar()){
+	while(1)
+	{
+		switch(getchar())
+		{
+			//NEW GAME
 			case 'N':
 			case 'n':
 				printw("New game started!");
 				refresh();
 				usleep(1900000);
+				
 				NewGame();
 				break;
+
+			//LOAD GAME
 			case 'L':
 			case 'l':
 				Load();
 				break;
+
+			//QUIT GAME
 			case 'Q':
 			case 'q':
 				printw("Bye!");
 				refresh();
 				usleep(1900000);
 				break;
+
 			default:
 				continue;
 		}
@@ -52,7 +63,8 @@ void CMenu::Start(){
 	refresh();
 }
 
-void CMenu::Load(){
+void CMenu::Load()
+{
 	clear();
 	printw("Load game - please type the exact name of the savefile (max. 100 characters)");
 	refresh();
@@ -61,6 +73,7 @@ void CMenu::Load(){
 	echo();
 	curs_set(1);
 
+	//get name of the file from the user
 	char file_name[50];
 	getstr(file_name);
 
@@ -70,22 +83,27 @@ void CMenu::Load(){
 
 	ifstream file(file_name, ios::in);
 
-	if(!file.is_open()){
+	if(!file.is_open())
+	{
 		printw("Error - cannot open file \"%s\"\nTry again? [Y/N]", file_name);
 		refresh();
 
 		while(1)
 		{
 			switch(getchar())
-			{
+			{	
+				//YES
 				case 'Y':
 				case 'y':
 					Load();
 					break;
+
+				//NO
 				case 'N':
 				case 'n':
 					Start();
 					break;
+
 				default:
 					continue;
 			}
@@ -94,6 +112,8 @@ void CMenu::Load(){
 		}
 	}
 	else{
+		
+		//if the file fails to load, let the user try again
 		if(!LoadGame(file)){
 			Load();
 		}

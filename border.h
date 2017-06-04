@@ -7,6 +7,7 @@
 	* Structure representing a border (piece of wall)
 	*/
 struct TBorder{
+
 	/*!
 	* Constructor
 	* @param ypos vertical position of the border
@@ -14,10 +15,10 @@ struct TBorder{
 	*/
 	TBorder(const int & ypos, const int & xpos) : t_ypos(ypos), t_xpos(xpos) {}
 
-	//! Vertical position of the border
+	//! vertical position of the border
 	int t_ypos;
 
-	//! Horizontal position of the border
+	//! horizontal position of the border
 	int t_xpos;
 };
 

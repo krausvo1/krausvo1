@@ -1,9 +1,14 @@
 #include "advancedT.h"
 
-CAdvancedTower::CAdvancedTower(const int & ypos, const int & xpos):
-					    	   CTower(T_ADVANCED, ypos, xpos), m_stun_ready(true), m_use_stun(false){}
+CAdvancedTower::CAdvancedTower(const int & ypos, 
+							   const int & xpos) :
 
-void CAdvancedTower::Shoot(CAttacker & attacker){
+					    	   CTower(T_ADVANCED, ypos, xpos), m_stun_ready(true), m_use_stun(false)
+{
+}
+
+void CAdvancedTower::Shoot(CAttacker & attacker)
+{
 	if(m_use_stun)
 		attacker.TakeHit(5, false);
 	else{
@@ -12,26 +17,36 @@ void CAdvancedTower::Shoot(CAttacker & attacker){
 	}
 }
 
-int CAdvancedTower::ChooseTarget() const{
+int CAdvancedTower::ChooseTarget() const
+{
+	//choose the first attacker who stepped in range
 	return v_targets[0]->AttackerID();
 }
 
-void CAdvancedTower::ChargeStun(){
+void CAdvancedTower::ChargeStun()
+{
 	m_stun_ready = true;
 }
 
-bool CAdvancedTower::InRange(const CAttacker & attacker){
-	for(int j = - 1; j < m_range; j++)
-		for(int k = - 1; k < m_range; k++)
-			if((m_ypos + j == attacker.AttackerRealYpos()) && (m_xpos + k == attacker.AttackerRealXpos()) 
-				&& ClearShot(attacker)){
+bool CAdvancedTower::InRange(const CAttacker & attacker)
+{
+	//check whether the attacker is in towers 3x3 range
+	for(int j = - 1; j < T_RANGE; j++)
+		for(int k = - 1; k < T_RANGE; k++)
+			if((m_ypos + j == attacker.AttackerRealYpos()) && 
+			   (m_xpos + k == attacker.AttackerRealXpos()) &&
+				ClearShot(attacker))
+			{
 				m_use_stun = false;
 				return true;
 			}
 
+	//check whether the attacker is 2 steps from the tower in any of the four basic directions
+	//(top, bottom, left, right)
 	if(((std::abs(attacker.AttackerRealYpos() - m_ypos) == 2 && m_xpos == attacker.AttackerRealXpos()) ||
 	   (std::abs(attacker.AttackerRealXpos() - m_xpos) == 2 && m_ypos == attacker.AttackerRealYpos())) &&
-		ClearShot(attacker)){
+		ClearShot(attacker))
+	{
 		m_use_stun = true;
 		return true;
 	}
@@ -39,10 +54,12 @@ bool CAdvancedTower::InRange(const CAttacker & attacker){
 	return false;
 }
 
-void CAdvancedTower::CheckRange(){
+void CAdvancedTower::CheckBlindSpots()
+{
 	bool top = false, bottom = false, left = false, right = false;
 
-	for(unsigned int i = 0; i < v_borders.size(); i++){
+	for(unsigned int i = 0; i < v_borders.size(); i++)
+	{
 		if(v_borders[i].t_ypos == m_ypos - 1 && v_borders[i].t_xpos == m_xpos){
 			v_blind_spots.push_back(std::make_pair(m_ypos - 2, m_xpos));
 			top = true;

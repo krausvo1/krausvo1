@@ -34,7 +34,7 @@ CMap::~CMap()
           delete v_attackers[i];  
 }
 
-void CMap::NextFrame()
+void CMap::NextRound()
 {
 	PrintBorders();
 	PrintTowers();
@@ -101,7 +101,7 @@ void CMap::CheckCollisions()
 			if(v_attackers[a]->IsInGame() && v_towers[t]->InRange(*v_attackers[a]))
 				v_towers[t]->AddTarget(v_attackers[a]);
 
-		if(v_towers[t]->TargetsCount())
+		if(v_towers[t]->TargetsEmpty())
 			v_towers[t]->Shoot(*v_attackers[v_towers[t]->ChooseTarget()]);
 		else
 			if(v_towers[t]->TowerType() == T_ADVANCED)
@@ -239,7 +239,7 @@ void CMap::PrintLogs()
 			health = v_logs[i].t_health;
 
 		move(m_maxheight - 1,0);
-		printw("Attacker %d hit, remaining health: %d", v_logs[i].t_number, health);
+		printw("Attacker %d hit, remaining health: %d", v_logs[i].t_ID, health);
 		refresh();
 		usleep(3000000);
 	}
@@ -256,9 +256,9 @@ void CMap::SwitchLogs()
 		m_logs_on = true;
 }
 
-int CMap::TestRound(const int & gate_number)
+int CMap::TestRound(const int & gate_ID)
 {
-	CAdvancedAttacker test(v_gates[gate_number], 0);
+	CAdvancedAttacker test(v_gates[gate_ID], 0);
 
 	while(!test.CheckWin())
 	{

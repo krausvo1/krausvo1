@@ -1,9 +1,10 @@
 #ifndef BASICA_H
 #define BASICA_H
+
 #include "attacker.h"
 
 	/*!
-	* Class representing a basic atacker
+	* Child class representing a basic atacker
 	*/
 class CBasicAttacker : public CAttacker{
 public:
@@ -30,14 +31,14 @@ public:
 	virtual ~CBasicAttacker(){};
 
 	/*!
-	* Decreases the amount of attackers health
+	* Decrease the amount of attackers health
 	* @param damage damage taken, based on the type of shooting tower
-	* @param stun bool value m_escorted variable is being set to
+	* @param stun bool value m_stunned variable is being set to
 	*/
 	virtual void TakeHit(const int & damage, const bool & stun);
 
 	/*!
-	* Move this attacker to the next coordinate
+	* Move this attacker to next coordinate
 	* @return true when attackers health is larger than zero, false when otherwise 
 	*/
 	virtual bool Move();
@@ -48,5 +49,6 @@ private:
 	//! Decides whether this attacker is going to be stunned for a round or not
 	bool m_stunned;
 };
+
 
 #endif

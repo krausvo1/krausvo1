@@ -1,9 +1,10 @@
 #ifndef ADVANCEDA_H
 #define ADVANCEDA_H
+
 #include "attacker.h"
  
 	/*!
-	* Class representing an advanced atacker
+	* Child class representing an advanced atacker
 	*/
 class CAdvancedAttacker : public CAttacker{
 public:
@@ -30,9 +31,9 @@ public:
 	virtual ~CAdvancedAttacker(){};
 
 	/*!
-	* Decreases the amount of attackers health
+	* Decrease the amount of attackers health
 	* @param damage damage taken, based on the type of shootin tower
-	* @param stun bool value m_is_escorted variable is being set to (does not apply to this type of attacker)
+	* @param stun bool value m_stunned variable is being set to (does not apply to this type of attacker)
 	*/
 	virtual void TakeHit(const int & damage, const bool & stun);
 
@@ -42,5 +43,6 @@ public:
 	*/
 	virtual bool Move();
 };
+
 
 #endif
