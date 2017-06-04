@@ -126,7 +126,7 @@ public:
 	std::vector< std::pair<int,int> > FindPath		(CGate & start);
 
 	/*!
-	* Generate a new map 
+	* Generate a new map with obstacles
 	*/
 	void GenerateMap();
 

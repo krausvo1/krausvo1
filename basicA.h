@@ -15,6 +15,7 @@ public:
 	* @param xpos horizontal position of the attacker
 	* @param ID ID number of the attacker
 	* @param health number of health the attacker has
+	* @param stunned decides whetherthe attacker will be stunned next round
 	*/
 	CBasicAttacker(const int & ypos, const int & xpos, const int & ID, const int & health, const bool & stunned);
 

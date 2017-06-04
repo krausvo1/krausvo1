@@ -156,7 +156,7 @@ void CMap::CheckPriorities(CAttacker & attacker)
 
 	for(unsigned int i = 0; i < v_attackers.size() - 1; i++)
 	{
-		if((v_attackers[i]->m_start.path.size() - (attacker.AttackerMoves() + difference) > 0) && 
+		if((attacker.m_start.path.size() - (attacker.AttackerMoves() + difference) > 0) && 
 		   (v_attackers[i]->IsInGame()) &&
 		   (v_attackers[i]->AttackerRealYpos() == attacker.m_start.path[attacker.m_start.path.size() - (attacker.AttackerMoves() + difference)].first) &&
 		   (v_attackers[i]->AttackerRealXpos() == attacker.m_start.path[attacker.m_start.path.size() - (attacker.AttackerMoves() + difference)].second))

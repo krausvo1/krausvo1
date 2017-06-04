@@ -24,7 +24,7 @@ public:
 	* @param type character representing the attacker to be displayed displayed ('@' advanced attacker, '&' basic attacker)
 	* @param ypos vertical position of the attacker
 	* @param xpos horizontal position of the attacker
-	* @param number ID number of the attacker
+	* @param ID ID number of the attacker
 	* @param health number of health the attacker has
 	*/
 	CAttacker(const char & type, const int & ypos, const int & xpos, const int & ID, const int & health);
@@ -33,7 +33,7 @@ public:
 	* Constructor used to initialise a new basic attacker
 	* @param type character representing the attacker to be displayed displayed ('@' advanced attacker, '&' basic attacker)
 	* @param start the gate through which the attackers enters the game
-	* @param number ID number of the attacker
+	* @param ID ID number of the attacker
 	* @param health number of health the attacker starts with
 	*/
 	CAttacker(const char & type, const CGate & start, const int & ID, const int & health);
@@ -75,10 +75,10 @@ public:
 	virtual void TakeHit(const int & damage, const bool & stun) = 0;
 
 	/*!
-	* Sets m_stunned variable to true or false
-	* @param escorted bool value m_stunned variable is being set to 
+	* Set variable m_giving_way to true or false
+	* @param give_way bool value m_giving_way is being set to
 	*/
-	virtual void GiveWay(const bool & give_way);
+	void GiveWay(const bool & give_way);
 
 	/*!
 	* Get the type of the attacker

@@ -41,7 +41,7 @@ public:
 	std::vector<std::pair<int,int>> FindPath(const CGate & exit);
 
 	/*!
-	* Assign all information of this gate to another gate
+	* Assign all information about this gate to another gate
 	*/
 	CGate & operator= (const CGate & src);
 
