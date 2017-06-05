@@ -20,6 +20,9 @@ void CMenu::Start()
 	move(2,0);
 	printw("Press Q to quit.");
 
+	move(3,0);
+	printw("Press A to learn more about the game.");
+
 	refresh();
 	clear();
 
@@ -51,6 +54,12 @@ void CMenu::Start()
 				printw("Bye!");
 				refresh();
 				usleep(1900000);
+				break;
+
+			case 'A':
+			case 'a':
+				About();
+				Start();
 				break;
 
 			default:
@@ -118,4 +127,71 @@ void CMenu::Load()
 			Load();
 		}
 	}
+}
+
+void CMenu::About()
+{	
+	move(0,0);
+	printw("--------About the game--------");
+
+	move(1,0);
+	printw("Your task is to escort attackers");
+
+	move(2,0);
+	printw("across the map to the exit gate, marked with \'<\'.");
+
+	move(3,0);
+	printw("Attackers can be bought with money.");
+
+	move(4,0);
+	printw("You will get appropriate amount of money");
+
+	move(5,0);
+	printw("in the beginning of the game,\n");
+
+	move(6,0);
+	printw("more money can be earned during the game");
+
+	move(7,0);
+	printw("by escorting attackers. For each escorted");
+
+	move(8,0);
+	printw("attacker you receive 600$.");
+
+	move(10,0);
+	printw("You WIN the game if you manage");
+
+	move(11,0);
+	printw("to escort as many attackers as the goal states.");
+
+	move(12,0);
+	printw("You LOSE the game if all your attackers");
+
+	move(13,0);
+	printw("are dead and you run out of money to buy more of them.");
+
+	move(15,0);
+	printw("--------Controls--------");
+
+	move(16,0);
+	printw("To send an attacker in the game through a certain gate,");
+
+	move(17,0);
+	printw("press the number of the gate and buy desired type of the attacker.");
+
+	move(19,0);
+	printw("Press L during the game to switch displaying of logs ON/OFF");
+
+	move(20,0);
+	printw("Press S during the game to save the game.");
+
+	move(21,0);
+	printw("Press Q during the game to end the game.");
+
+	move(23,0);	
+	printw("################## PRESS ANY KEY NOW TO GO BACK TO MENU ##################");
+	refresh();
+
+	nodelay(stdscr, false);
+	getchar();
 }

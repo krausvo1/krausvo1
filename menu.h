@@ -28,6 +28,11 @@ public:
 	* Receive name of the file to be loaded
 	*/
 	void Load();
+
+	/*!
+	* Display additional information about the game
+	*/
+	void About();
 };
 
 #endif
